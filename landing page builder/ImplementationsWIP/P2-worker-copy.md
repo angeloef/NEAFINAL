@@ -1,7 +1,7 @@
 ---
 id: worker-copy
 title: Worker Copy → copy.json
-status: pending
+status: completed
 area: worker/copy
 related_areas: [contracts, worker/research]
 priority: P2
@@ -40,3 +40,4 @@ Diseño visual, tokens, render. No inventar datos para "rellenar".
 
 ## Bitácora (append-only)
 - 2026-06-23 — Plan creado.
+- 2026-06-23 — Implementado: `packages/worker-copy/` con `src/prompt.ts`, `src/index.ts`, `test/copy.test.ts`. Gates: lint ✓, 4/4 tests ✓, build ✓. Ponytail review aplicado (-10 líneas). Hard guardrail AC-02 confirmado por test (prueba_social stripped cuando dossier sin reseñas).
