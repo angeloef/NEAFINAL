@@ -52,7 +52,7 @@ landing page builder/
 | p4-pageplan-schema | contracts | P4 | completed | — |
 | p4-block-library | worker/assembly | P4 | completed | p4-react-setup, p4-pageplan-schema |
 | p4-image-pool | worker/assembly | P4 | completed | p4-react-setup |
-| p4-quality-gate | validation | P4 | pending | p4-pageplan-schema |
+| p4-quality-gate | validation | P4 | completed | p4-pageplan-schema |
 | p4-pageplan-llm | worker/copy | P4 | pending | p4-pageplan-schema |
 | p4-runner-e2e | runner | P4 | pending | p4-block-library, p4-image-pool, p4-quality-gate, p4-pageplan-llm |
 
