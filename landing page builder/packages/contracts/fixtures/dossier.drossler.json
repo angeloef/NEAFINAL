@@ -1,0 +1,12 @@
+{
+  "mission_id": "drossler_obera",
+  "entidad": {
+    "nombre": { "valor": "Estudio Jurídico Drössler & Bárbaro", "clase": "VERIFICADO-OBLIG", "source": "google_maps_cid", "confidence": 0.9, "fecha": "2026-06-23" }
+  },
+  "ubicacion": {
+    "ciudad": { "valor": "Oberá", "clase": "INFERIDO", "source": "directorio_local", "confidence": 0.4, "fecha": "2026-06-23" }
+  },
+  "contacto": {},
+  "place_id": { "valor": "cid:16702906282137664264", "clase": "VERIFICADO-OBLIG", "source": "google_maps_cid", "confidence": 0.99, "fecha": "2026-06-23" },
+  "estado_web": "sin_web"
+}

@@ -1,0 +1,7 @@
+{
+  "name": "landing-page-builder",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Rev 2 (Missions) landing generator for prospects",
+  "packageManager": "pnpm@9.12.0"
+}
