@@ -50,7 +50,7 @@ landing page builder/
 | p4-composable-blocks | worker/assembly | P4 | decompuesto | presentation |
 | p4-react-setup | worker/assembly | P4 | completed | — |
 | p4-pageplan-schema | contracts | P4 | completed | — |
-| p4-block-library | worker/assembly | P4 | pending | p4-react-setup, p4-pageplan-schema |
+| p4-block-library | worker/assembly | P4 | completed | p4-react-setup, p4-pageplan-schema |
 | p4-image-pool | worker/assembly | P4 | completed | p4-react-setup |
 | p4-quality-gate | validation | P4 | pending | p4-pageplan-schema |
 | p4-pageplan-llm | worker/copy | P4 | pending | p4-pageplan-schema |
