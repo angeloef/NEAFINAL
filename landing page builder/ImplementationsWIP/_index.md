@@ -40,7 +40,7 @@ landing page builder/
 | id | área | prioridad | status | depends_on |
 |---|---|---|---|---|
 | contracts-schemas | contracts | P0 | completed | — |
-| orchestration-core | orchestration | P1 | pending | contracts-schemas |
+| orchestration-core | orchestration | P1 | completed | contracts-schemas |
 | worker-research | worker/research | P1 | pending | contracts-schemas |
 | worker-copy | worker/copy | P2 | pending | contracts-schemas, worker-research |
 | worker-brand | worker/brand | P2 | pending | contracts-schemas, worker-research |

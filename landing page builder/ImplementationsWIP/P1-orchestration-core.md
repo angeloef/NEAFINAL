@@ -1,7 +1,7 @@
 ---
 id: orchestration-core
 title: Orquestación y bookkeeping (fleet + misión)
-status: pending
+status: completed
 area: orchestration
 related_areas: [contracts, validation]
 priority: P1
@@ -21,14 +21,14 @@ Falta el orquestador (nivel **fleet** y nivel **misión**) y el bookkeeping dete
 - `.claude/agents/` — definiciones de subagente por rol (orquestador=Opus 4.8, workers=Sonnet 4.6, validadores=Opus 4.8).
 
 ## Criterios de aceptación
-- [ ] State machine fina: `planificando → ejecutando → validando → (en_cola | aprobado) → presentado`.
-- [ ] **Gating**: bloquea avance de milestone si un handoff reporta issues no resueltos o assertions bloqueantes sin cubrir.
-- [ ] **Fleet**: itera prospectos, 1 misión por prospecto, **paralelo entre prospectos** (outputs independientes), **serial dentro** de la misión.
-- [ ] Tracking de presupuesto (tokens/usd) por misión, persistido en `mission_state`.
-- [ ] Definiciones de subagente por rol con su modelo asignado.
-- [ ] `mission_state` persistido por prospecto en disco → **resume entre sesiones** en frío.
-- [ ] Mission control v0 = lectura de `mission_state` (CLI/JSON). Sin UI todavía.
-- [ ] Test: una misión simulada con handoff "con issues" NO avanza de milestone.
+- [x] State machine fina: `planificando → ejecutando → validando → (en_cola | aprobado) → presentado`.
+- [x] **Gating**: bloquea avance de milestone si un handoff reporta issues no resueltos o assertions bloqueantes sin cubrir.
+- [x] **Fleet**: itera prospectos, 1 misión por prospecto, **paralelo entre prospectos** (outputs independientes), **serial dentro** de la misión.
+- [x] Tracking de presupuesto (tokens/usd) por misión, persistido en `mission_state`.
+- [x] Definiciones de subagente por rol con su modelo asignado.
+- [x] `mission_state` persistido por prospecto en disco → **resume entre sesiones** en frío.
+- [x] Mission control v0 = lectura de `mission_state` (CLI/JSON). Sin UI todavía.
+- [x] Test: una misión simulada con handoff "con issues" NO avanza de milestone.
 
 ## Dirección sugerida (no vinculante)
 Orquestación en texto (prompts/skills, ~cientos de líneas editables; cuatro frases pueden cambiar la estrategia). Bookkeeping en TS. Subagentes vía la herramienta Task. Estado en archivos JSON por prospecto (amigable a multi-sesión). Paralelización **solo de lectura** dentro de features/validadores.
@@ -43,3 +43,4 @@ UI de mission control (eso es P3). Lógica interna de cada worker (sus propios p
 
 ## Bitácora (append-only)
 - 2026-06-23 — Plan creado.
+- 2026-06-23 — Implementado: `packages/orchestrator/` (state, gating, budget, fleet, bin/mission-control). Agentes `.claude/agents/{orchestrator,worker,validator}.md`. Gates: lint ✓, 7/7 tests ✓. Ponytail aplicado (doble-load eliminado, bug tokens_max corregido).
