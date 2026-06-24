@@ -43,10 +43,18 @@ landing page builder/
 | orchestration-core | orchestration | P1 | completed | contracts-schemas |
 | worker-research | worker/research | P1 | completed | contracts-schemas |
 | worker-copy | worker/copy | P2 | completed | contracts-schemas, worker-research |
-| worker-brand | worker/brand | P2 | pending | contracts-schemas, worker-research |
-| validation-harness | validation | P2 | pending | contracts-schemas |
-| worker-assembly | worker/assembly | P3 | pending | worker-copy, worker-brand |
-| presentation | presentation | P3 | pending | worker-assembly, validation-harness |
+| worker-brand | worker/brand | P2 | completed | contracts-schemas, worker-research |
+| validation-harness | validation | P2 | completed | contracts-schemas |
+| worker-assembly | worker/assembly | P3 | completed | worker-copy, worker-brand |
+|| presentation | presentation | P3 | completed | worker-assembly, validation-harness |
+| p4-composable-blocks | worker/assembly | P4 | decompuesto | presentation |
+| p4-react-setup | worker/assembly | P4 | pending | — |
+| p4-pageplan-schema | contracts | P4 | pending | — |
+| p4-block-library | worker/assembly | P4 | pending | p4-react-setup, p4-pageplan-schema |
+| p4-image-pool | worker/assembly | P4 | pending | p4-react-setup |
+| p4-quality-gate | validation | P4 | pending | p4-pageplan-schema |
+| p4-pageplan-llm | worker/copy | P4 | pending | p4-pageplan-schema |
+| p4-runner-e2e | runner | P4 | pending | p4-block-library, p4-image-pool, p4-quality-gate, p4-pageplan-llm |
 
 ## Orden sugerido de ejecución
 1. `contracts-schemas` (todo depende de esto)
@@ -58,3 +66,8 @@ landing page builder/
 
 ## Bitácora global
 - 2026-06-23 — Planes creados desde la arquitectura Rev 2. Stack y modelos acordados con el usuario.
+- 2026-06-24 — worker-brand implementado (Hermes Agent). 11 tests pasando. Build OK.
+- 2026-06-24 — worker-assembly implementado (Hermes Agent). 10 tests pasando. Build OK.
+- 2026-06-24 — validation-harness implementado (Hermes Agent). 32 tests pasando (20 contrast + 9 scrutiny + 3 usertesting). Build OK.
+- 2026-06-24 — presentation implementado (Hermes Agent). 20 tests pasando. Publish gating + Mission Control v1 dashboard. PROYECTO COMPLETO.
+- 2026-06-24 — P4-composable-blocks DECOMPUESTO en P4.1–P4.7 (briefings hijos con depends_on). Próximos ejecutables sin deps: p4-react-setup, p4-pageplan-schema. Orden: 4.1+4.2 → 4.3/4.4/4.5/4.6 → 4.7 (cierra P4). El archivo madre queda como spec de referencia.
