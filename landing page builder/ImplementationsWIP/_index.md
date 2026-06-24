@@ -51,7 +51,7 @@ landing page builder/
 | p4-react-setup | worker/assembly | P4 | completed | — |
 | p4-pageplan-schema | contracts | P4 | completed | — |
 | p4-block-library | worker/assembly | P4 | pending | p4-react-setup, p4-pageplan-schema |
-| p4-image-pool | worker/assembly | P4 | pending | p4-react-setup |
+| p4-image-pool | worker/assembly | P4 | completed | p4-react-setup |
 | p4-quality-gate | validation | P4 | pending | p4-pageplan-schema |
 | p4-pageplan-llm | worker/copy | P4 | pending | p4-pageplan-schema |
 | p4-runner-e2e | runner | P4 | pending | p4-block-library, p4-image-pool, p4-quality-gate, p4-pageplan-llm |
@@ -71,4 +71,5 @@ landing page builder/
 - 2026-06-24 — validation-harness implementado (Hermes Agent). 32 tests pasando (20 contrast + 9 scrutiny + 3 usertesting). Build OK.
 - 2026-06-24 — presentation implementado (Hermes Agent). 20 tests pasando. Publish gating + Mission Control v1 dashboard. PROYECTO COMPLETO.
 - 2026-06-24 — p4-react-setup (P4.1) implementado. Pipeline `renderReactPage` en worker-assembly: React → `renderToStaticMarkup` + Tailwind v4 (`@tailwindcss/node`) compilado a CSS inline en `<head>`. 13 tests verdes (10 existentes + 3 smoke). Build/lint OK. Commit local sin push (instrucción del usuario). Desbloquea p4-block-library y p4-image-pool.
+- 2026-06-24 — p4-image-pool (P4.4) implementado. `src/blocks/images.ts`: pool de 15 URLs free-use (Unsplash, verificadas 200 OK una vez) en 10 categorías + `pickImages()` con no-repetición por página, alt temático en español y params de tamaño/calidad. 6 tests verdes (no-repetición, alt no vacío, categorías hero/about/cta distintas, exhaustion guard). Build/lint OK. Commit local sin push.
 - 2026-06-24 — P4-composable-blocks DECOMPUESTO en P4.1–P4.7 (briefings hijos con depends_on). Próximos ejecutables sin deps: p4-react-setup, p4-pageplan-schema. Orden: 4.1+4.2 → 4.3/4.4/4.5/4.6 → 4.7 (cierra P4). El archivo madre queda como spec de referencia.
