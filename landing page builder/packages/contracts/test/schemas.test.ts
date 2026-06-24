@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, it, expect } from "vitest";
-import { validate, type Copy, type Tokens, type Handoff, type MissionState } from "../src/index.js";
+import { validate, type Copy, type Tokens, type Handoff, type MissionState, type PagePlan } from "../src/index.js";
 
 const fixturesDir = join(dirname(fileURLToPath(import.meta.url)), "..", "fixtures");
 const load = (name: string) => JSON.parse(readFileSync(join(fixturesDir, name), "utf8"));
@@ -94,5 +94,69 @@ describe("copy / tokens / handoff / mission_state", () => {
   it("rechaza tipo de artefacto desconocido", () => {
     // @ts-expect-error tipo inválido a propósito
     expect(validate(copy, "inexistente").ok).toBe(false);
+  });
+});
+
+describe("page_plan", () => {
+  const plan: PagePlan = {
+    mission_id: "koziarski_obera",
+    blocks: [
+      {
+        type: "hero",
+        variant: "image_overlay",
+        data: {
+          titulo: { valor: "Estudio Koziarski", clase: "VERIFICADO-OBLIG" },
+          cta_texto: "Consultá por WhatsApp",
+        },
+      },
+      {
+        type: "areas",
+        variant: "cards_icon",
+        data: {
+          titulo: "Áreas de práctica",
+          items: [{ valor: "Derecho laboral", clase: "PLANTILLA" }],
+        },
+      },
+      {
+        type: "contact",
+        variant: "channels",
+        data: {
+          titulo: "Contacto",
+          whatsapp: { valor: "+5493755111111", clase: "VERIFICADO-OBLIG" },
+        },
+      },
+      {
+        type: "footer",
+        variant: "nap",
+        data: { nombre: { valor: "Estudio Koziarski", clase: "VERIFICADO-OBLIG" } },
+      },
+    ],
+    meta: { title: "Estudio Koziarski — Abogados en Oberá", description: "Asesoría legal en Oberá, Misiones." },
+  };
+
+  it("acepta un PagePlan válido", () => {
+    expect(validate(plan, "page_plan").ok).toBe(true);
+  });
+
+  it("rechaza un type de bloque inválido", () => {
+    const bad = { ...plan, blocks: [{ ...plan.blocks[0], type: "banner" }] };
+    expect(validate(bad, "page_plan").ok).toBe(false);
+  });
+
+  it("exige clase en campos fácticos (hero.data.titulo)", () => {
+    const bad = {
+      ...plan,
+      blocks: [
+        { type: "hero", variant: "centered", data: { titulo: { valor: "X" }, cta_texto: "Y" } },
+        ...plan.blocks.slice(1),
+      ],
+    };
+    const r = validate(bad, "page_plan");
+    expect(r.ok).toBe(false);
+    expect(!r.ok && r.errors.join(" ")).toContain("clase");
+  });
+
+  it("rechaza blocks vacío", () => {
+    expect(validate({ ...plan, blocks: [] }, "page_plan").ok).toBe(false);
   });
 });
