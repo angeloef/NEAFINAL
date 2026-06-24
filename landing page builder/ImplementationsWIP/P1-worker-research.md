@@ -1,7 +1,7 @@
 ---
 id: worker-research
 title: Worker Research → dossier.json
-status: pending
+status: in_progress
 area: worker/research
 related_areas: [contracts]
 priority: P1
