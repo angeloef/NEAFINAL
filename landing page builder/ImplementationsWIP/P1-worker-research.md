@@ -1,7 +1,7 @@
 ---
 id: worker-research
 title: Worker Research → dossier.json
-status: in_progress
+status: completed
 area: worker/research
 related_areas: [contracts]
 priority: P1
@@ -44,3 +44,4 @@ Matrícula / CADEMIS. Copy y tokens (otros workers). Render.
 
 ## Bitácora (append-only)
 - 2026-06-23 — Plan creado.
+- 2026-06-23 — Implementado. SHA: 5cfad15. Gates: build ✅ | 5/5 tests ✅ | ponytail-review ✅ (eliminé `ogImage` dead var y `Anthropic` client a nivel módulo). Packages: `@lpb/worker-research` con 6 módulos (types, resolver, places, scraper, llm, routing) + pipeline en index.ts. No hay deploy; paquete interno.
