@@ -1,0 +1,35 @@
+name: debugging_with_pdb
+description: "Debug Python code using pdb and traceback analysis"
+parameters:
+  type: object
+  properties:
+    file_path:
+      type: string
+      description: "Path to the Python file to debug"
+    error_traceback:
+      type: string
+      description: "Full traceback string from the error"
+  required:
+    - file_path
+    - error_traceback
+strict: false
+triggers:
+  - "debug"
+  - "traceback"
+  - "exception"
+  - "error in"
+instructions: |
+  When debugging Python code:
+  1. Read the file at file_path
+  2. Identify the line from the traceback
+  3. Insert pdb.set_trace() before the failing line
+  4. Run the file and interact with pdb
+  5. Report the root cause and fix
+example_usage: |
+  User: "I'm getting a TypeError in src/main.py"
+  Agent loads debugging_with_pdb skill, reads the file, inserts pdb, diagnoses the issue.
+tools:
+  - read_file
+  - terminal
+  - patch
+priority: medium
