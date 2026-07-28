@@ -1,0 +1,654 @@
+{
+  "_comment": "Mapa de contenido NEASistemas sobre la estructura de la home de Tiendanube. Cada par es [texto_original, texto_nuevo] u opcionalmente [orig, nuevo, max_reemplazos]. Se aplican en este orden; los anclados con markup van primero para evitar colisiones de substring. Fuente del copy: seo/proyecto-seo/clientes/neasistemas/",
+  "meta": [
+    [
+      "Tiendanube | Creá gratis tu tienda online",
+      "NEASistemas | Web, marketing y sistemas a medida para tu negocio"
+    ],
+    [
+      "El mejor diseño para tu marca, 100+ aplicaciones para potenciar tu tienda y soporte humano cuando necesites. Vendé con la plataforma de e-commerce más elegida de Argentina.",
+      "Web, SEO, Ads y sistemas a medida en cuatro etapas independientes. Mockup real antes de firmar, dominio y código a tu nombre. Oberá, Misiones — atendemos toda Argentina."
+    ]
+  ],
+  "anclados": [
+    [
+      "footer-column-title\">Tienda online</p>",
+      "footer-column-title\">Servicios</p>"
+    ],
+    [
+      "<span class=\"menu-featured-card-tagline d-block mb-24 small\">Especialistas</span>",
+      "<span class=\"menu-featured-card-tagline d-block mb-24 small\">Sistemas a medida</span>"
+    ],
+    [
+      "alt=\"Especialistas Tiendanube\"",
+      "alt=\"Sistemas a medida NEASistemas\""
+    ],
+    [
+      "<br class=\"d-md-none\">Especialistas",
+      "<br class=\"d-md-none\">búsquedas por mes sin dueño"
+    ],
+    [
+      "&lt;br class=&quot;d-md-none&quot;&gt;Especialistas",
+      "&lt;br class=&quot;d-md-none&quot;&gt;búsquedas por mes sin dueño"
+    ],
+    [
+      "<span>+180 mil</span> marcas <br class=\"d-none d-sm-block\"> crecen con Tiendanube",
+      "<span>Negocios</span> donde la imagen <br class=\"d-none d-sm-block\"> decide la venta"
+    ],
+    [
+      "2011 - 2026 &copy; Tiendanube",
+      "2026 &copy; NEASistemas"
+    ]
+  ],
+  "productos": [
+    [
+      "Pago Nube",
+      "Diseño Web"
+    ],
+    [
+      "Envío Nube",
+      "Tienda Online"
+    ],
+    [
+      "Chat Nube",
+      "Marketing Digital"
+    ],
+    [
+      "Marketing Nube",
+      "Sistemas a Medida"
+    ],
+    [
+      "Tiendanube Especialistas",
+      "Mockup antes de firmar"
+    ],
+    [
+      "Tiendanube Evolución",
+      "Diseño gráfico y logo"
+    ],
+    [
+      "Sobre Tiendanube",
+      "Nosotros"
+    ],
+    [
+      "Trabajá en Tiendanube",
+      "Oberá, Misiones"
+    ],
+    [
+      "Crear tienda gratis",
+      "Pedí tu mockup gratis"
+    ],
+    [
+      "Probar gratis por 7 días",
+      "Ver qué incluye"
+    ],
+    [
+      "Tiendanube",
+      "NEASistemas"
+    ]
+  ],
+  "footer": [
+    [
+      "Funcionalidades",
+      "Diseño web"
+    ],
+    [
+      "Canales de venta",
+      "Ecommerce y tienda online"
+    ],
+    [
+      "Tienda de diseños",
+      "Marketing, SEO y Ads"
+    ],
+    [
+      "Tienda de aplicaciones",
+      "Sistemas a medida"
+    ],
+    [
+      "Ecosistema",
+      "Cómo trabajamos"
+    ],
+    [
+      "Servicios e integraciones",
+      "El método en 3 pasos"
+    ],
+    [
+      "Convertite en socio",
+      "KPIs acordados por etapa"
+    ],
+    [
+      "E-books",
+      "Guía de precios de mercado"
+    ],
+    [
+      "Historias de éxito",
+      "Casos reales"
+    ],
+    [
+      "Herramientas gratuitas",
+      "Qué es el SEO"
+    ],
+    [
+      "Ayuda",
+      "Contacto"
+    ],
+    [
+      "Página de Status",
+      "WhatsApp"
+    ],
+    [
+      "Contactá a un especialista",
+      "Escribinos"
+    ]
+  ],
+  "header": [
+    [
+      "Soluciones para",
+      "Soluciones para"
+    ],
+    [
+      "cada necesidad",
+      "cada tipo de negocio"
+    ],
+    [
+      "Para quienes empiezan a vender",
+      "Negocios sin web propia"
+    ],
+    [
+      "Migrar tu tienda de plataforma",
+      "Rehacer una web que no funciona"
+    ],
+    [
+      "Ya venden en redes sociales",
+      "Ya venden por Instagram"
+    ],
+    [
+      "Tienen tienda física",
+      "Tienen local o taller"
+    ],
+    [
+      "Venden en marketplaces",
+      "Profesionales y estudios creativos"
+    ],
+    [
+      "Casos de éxito",
+      "Casos reales"
+    ],
+    [
+      "Historias de quienes crecieron con NEASistemas",
+      "Diagnósticos y mockups reales, sin maquillar"
+    ],
+    [
+      "Plataforma",
+      "Servicios"
+    ],
+    [
+      "Creá tu tienda online",
+      "Una web que convierte visitas en consultas"
+    ],
+    [
+      "Vendé por Instagram, Facebook y WhatsApp",
+      "Catálogo, pagos, envíos y pedidos integrados"
+    ],
+    [
+      "Migrá tu tienda",
+      "Diseño gráfico y logo"
+    ],
+    [
+      "Traé tu negocio a NEASistemas",
+      "Identidad visual para tu marca"
+    ],
+    [
+      "Offline",
+      "Mockup previo"
+    ],
+    [
+      "Integrá tu local con una tienda online y facturá más",
+      "Ves tu web navegable antes de firmar nada"
+    ],
+    [
+      "Layouts",
+      "Ejemplos"
+    ],
+    [
+      "Otras soluciones complican,",
+      "Otras agencias prometen,"
+    ],
+    [
+      "nosotros simplificamos.",
+      "nosotros te lo mostramos."
+    ],
+    [
+      "Personalizá layout, colores y fuentes a tu gusto",
+      "Recorré un mockup real de tu negocio antes de decidir"
+    ],
+    [
+      "Canales",
+      "SEO"
+    ],
+    [
+      "Conectá tu tienda y vendé en Facebook e Instagram",
+      "Aparecé en Google cuando buscan lo que vendés"
+    ],
+    [
+      "IA que atiende 24h, catálogo conectado y carritos recuperados",
+      "Campañas de búsqueda, display y shopping, gestionadas"
+    ],
+    [
+      "Captá, vendé y fidelizá con e-mails automatizados",
+      "Pauta en Facebook e Instagram sobre una base que convierte"
+    ],
+    [
+      "Aparecé en Pinterest y convertí pines en ventas",
+      "Presencia consistente donde tu cliente ya te busca"
+    ],
+    [
+      "Contratá expertos certificados para crecer tu negocio",
+      "KPIs acordados por etapa, antes de empezar"
+    ],
+    [
+      "Construí tu visión con especialistas",
+      "Automatizá lo que hoy hacés a mano"
+    ],
+    [
+      "Profesionales certificados para hacer crecer tu negocio",
+      "Reservas, pedidos, cobros y atención, resueltos por el sistema"
+    ],
+    [
+      "Tu asistente inteligente 24/7, directo por WhatsApp",
+      "SEO y campañas para que te encuentren"
+    ],
+    [
+      "La solución de pagos más utilizada de NEASistemas",
+      "Tu sitio propio, rápido y pensado para convertir"
+    ],
+    [
+      "La solución de envíos de NEASistemas",
+      "Ecommerce con catálogo, pagos y envíos"
+    ],
+    [
+      "Estadísticas",
+      "Facturación"
+    ],
+    [
+      "Tomá decisiones inteligentes para generar más ventas",
+      "Presupuestos y facturas prolijas, sin planillas sueltas"
+    ],
+    [
+      "Aplicaciones e integraciones",
+      "Integraciones"
+    ],
+    [
+      "Potenciá tu negocio con aplicaciones fáciles de usar",
+      "Conectamos lo que ya usás con lo que construimos"
+    ],
+    [
+      "Ventas Mayoristas",
+      "Soporte y mejoras"
+    ],
+    [
+      "Ampliá tus ingresos con condiciones exclusivas",
+      "El sistema evoluciona con tu negocio"
+    ],
+    [
+      "Herramientas",
+      "Ecosistema"
+    ],
+    [
+      "Soluciones para hacer crecer tu negocio online",
+      "Cuatro frentes que funcionan conectados"
+    ],
+    [
+      "Lanzamientos",
+      "Método"
+    ],
+    [
+      "Innova 2026",
+      "Analizar → Diseñar → Construir"
+    ],
+    [
+      "Ventas directo por WhatsApp con Marketing Digital y +100 lanzamientos",
+      "Analizamos tu negocio antes de tocar tecnología"
+    ],
+    [
+      "Grandes marcas",
+      "Nosotros"
+    ],
+    [
+      "Acceder a mi panel",
+      "Escribinos"
+    ],
+    [
+      "Login",
+      "Contacto"
+    ],
+    [
+      "Pinterest",
+      "Contenido y redes"
+    ]
+  ],
+  "hero": [
+    [
+      "Más que una tienda online.",
+      "Más que una página web."
+    ],
+    [
+      "La plataforma para",
+      "El sistema para que tu"
+    ],
+    [
+      "vender más",
+      "negocio venda y opere solo"
+    ],
+    [
+      "Creá tu tienda gratis",
+      "Pedí tu mockup gratis"
+    ],
+    [
+      "Hablá con un especialista",
+      "Hablemos 15 minutos"
+    ]
+  ],
+  "features": [
+    [
+      "Vendé donde está tu cliente",
+      "Cuatro frentes, un solo sistema"
+    ],
+    [
+      "Todo conectado, en un solo lugar",
+      "Conectados entre sí, no servicios sueltos"
+    ],
+    [
+      "Tienda online de alto rendimiento",
+      "Una web que convierte visitas en consultas"
+    ],
+    [
+      "Personalizá, gestioná y evolucioná tu tienda con total autonomía. Tené un canal propio que genera más rentabilidad.",
+      "Tu web es la puerta de entrada. Pensada para que quien te visite termine escribiéndote, no para que se vaya."
+    ],
+    [
+      "PDV integrado al mundo digital",
+      "Tu tienda online, con todo integrado"
+    ],
+    [
+      "Gestioná múltiples tiendas físicas con stock sincronizado y una operación unificada.",
+      "Catálogo, medios de pago, envíos y pedidos en un solo lugar, sin depender de que alguien conteste un mensaje."
+    ],
+    [
+      "Redes sociales que venden",
+      "Que te encuentren en Google y en las redes"
+    ],
+    [
+      "Tu catálogo en las redes sociales más importantes del mundo - con stock, pedidos y pagos integrados.",
+      "SEO para aparecer cuando buscan lo que vendés, y campañas pagas para acelerar cuando ya tenés algo que convierte."
+    ],
+    [
+      "Ventas 24/7 por WhatsApp",
+      "Sistemas que trabajan por vos"
+    ],
+    [
+      "Del &quot;hola&quot; al carrito de compra, todo por WhatsApp.  IA que habla y vende con la personalidad de tu marca.",
+      "Reservas, pedidos, cobros y atención por WhatsApp: todo eso se automatiza. Dejás de estar pendiente de cada mensaje."
+    ]
+  ],
+  "proceso": [
+    [
+      "Tu tienda, a tu manera,",
+      "Cómo es trabajar"
+    ],
+    [
+      "sin complicaciones",
+      "con nosotros, paso a paso"
+    ],
+    [
+      "Editor modular con IA integrada: armá, ajustá y publicá sin depender de nadie.",
+      "Analizar → Diseñar → Construir. Sabés exactamente qué pasa en cada etapa antes de empezar."
+    ],
+    [
+      "Elegir diseño",
+      "1. Analizamos tu negocio"
+    ],
+    [
+      "Empezá con +65 layouts listos para tu tienda. Cada uno pensado para vender — elegí, personalizá y publicá.",
+      "Antes de diseñar nada entendemos cómo funciona tu negocio hoy: quién te compra, qué te diferencia, qué resolver primero."
+    ],
+    [
+      "Agregar sección",
+      "2. Te mostramos un mockup real"
+    ],
+    [
+      "Fotos, videos, banners y vidrieras de producto: arrastrá bloques y armá la página que tu marca necesita.",
+      "No una promesa en PDF: algo navegable armado sobre tu caso. Lo ves, lo probás, y recién ahí decidís si seguimos."
+    ],
+    [
+      "Personalizar estilo",
+      "3. Construimos y medimos"
+    ],
+    [
+      "Tipografías, colores, espaciados y el visual completo de tu tienda. Cada ajuste refleja la identidad de tu marca.",
+      "Con KPIs acordados antes de empezar. Facturamos la siguiente etapa cuando la anterior ya mostró resultado."
+    ]
+  ],
+  "sticky": [
+    [
+      "Del pago a la gestión",
+      "Una web que convierte"
+    ],
+    [
+      "del negocio con",
+      "visitas en consultas:"
+    ],
+    [
+      "La solución financiera completa e integrada: checkout de alto rendimiento, mayor tasa de aprobación, gestión centralizada y cuotas para impulsar el crecimiento de tu negocio.",
+      "Tu web es la puerta de entrada: rápida, clara y pensada para convertir. Con dominio, código y cuentas a tu nombre desde el primer día — si te vas, te llevás todo."
+    ],
+    [
+      "Logística con infraestructura",
+      "Vendé online sin depender"
+    ],
+    [
+      "a través de",
+      "de contestar mensajes:"
+    ],
+    [
+      "Realizá tus envíos con estructura propia,",
+      "Catálogo, medios de pago, envíos y gestión de pedidos"
+    ],
+    [
+      "inteligencia de datos e integración total con tu tienda online.",
+      "integrados, para que la venta no dependa de que alguien esté mirando el celular."
+    ],
+    [
+      "Vendé las 24 horas,",
+      "Que te encuentren"
+    ],
+    [
+      "desde cualquier lugar,",
+      "cuando te buscan,"
+    ],
+    [
+      "IA que atiende, vende y cierra pedidos por WhatsApp",
+      "SEO para aparecer cuando alguien busca lo que vendés,"
+    ],
+    [
+      "a cualquier hora.",
+      "y Google Ads para acelerar."
+    ],
+    [
+      "Tu cliente siempre tiene respuesta, vos siempre vendés.",
+      "Demanda que ya existe en tu zona, capturada antes que tu competencia."
+    ],
+    [
+      "Vendé más a quienes",
+      "Que el trabajo repetitivo"
+    ],
+    [
+      "ya te conocen con",
+      "lo haga el sistema:"
+    ],
+    [
+      "Recuperá carritos, activá la posventa y aumentá",
+      "Reservas, pedidos, cobros y atención por WhatsApp"
+    ],
+    [
+      "la recurrencia con automatizaciones inteligentes,",
+      "automatizados e integrados con tu operación real,"
+    ],
+    [
+      "incrementando tus ventas hasta un 20%.",
+      "para que dejes de estar pendiente de cada mensaje."
+    ]
+  ],
+  "diferenciadores": [
+    [
+      "Recursos para acelerar tu próximo paso",
+      "Por qué elegirnos"
+    ],
+    [
+      "y hacerla bien",
+      "y no a otra agencia"
+    ],
+    [
+      "Aliados, contenidos y herramientas para ganar velocidad con menos prueba y error.",
+      "Mockup antes de firmar, todo a tu nombre, y podés frenar al final de cualquier etapa."
+    ],
+    [
+      "apps<br>disponibles",
+      "keywords<br>analizadas"
+    ],
+    [
+      "apps&lt;br&gt;disponibles",
+      "keywords&lt;br&gt;analizadas"
+    ],
+    [
+      "Potenciá tu operación con aplicaciones e integraciones.",
+      "Investigamos la demanda real de tu rubro y tu zona antes de escribir una línea de código."
+    ],
+    [
+      "Encontrá  expertos que te ayuden a construir, evolucionar y optimizar tu operación.",
+      "Búsquedas por mes en tu rubro que hoy no llegan a tu negocio porque no aparecés."
+    ]
+  ],
+  "planes": [
+    [
+      "Encontrá el plan ideal para tu negocio",
+      "Cuatro etapas, cotizadas por separado"
+    ],
+    [
+      "Inicial",
+      "Research"
+    ],
+    [
+      "Gratis",
+      "Incluido"
+    ],
+    [
+      "Todo lo que necesitás para emprender y vender online",
+      "Diagnóstico, keywords y arquitectura. Va incluido en el paquete Web."
+    ],
+    [
+      "Esencial",
+      "Web"
+    ],
+    [
+      "Más elegido",
+      "El primer paso"
+    ],
+    [
+      "$26.999 ARS",
+      "USD 700–1.200"
+    ],
+    [
+      "/mes",
+      " pago único",
+      2
+    ],
+    [
+      "$20.249,25 ARS",
+      "USD 700–1.200"
+    ],
+    [
+      "$242.991 ARS por año",
+      "Sitio en producción en 3–4 semanas"
+    ],
+    [
+      "Profesionalizá tu negocio y aumentá tus ventas",
+      "Tu sitio en producción, con dominio y código a tu nombre"
+    ],
+    [
+      "Impulso",
+      "SEO"
+    ],
+    [
+      "$78.999 ARS",
+      "USD 250–450"
+    ],
+    [
+      "$59.249,25 ARS",
+      "USD 250–450"
+    ],
+    [
+      "$710.991 ARS por año",
+      "Mínimo sugerido: 3 meses"
+    ],
+    [
+      "Automatizá tu negocio y llevá tus ventas al siguiente nivel",
+      "Posicionamiento en Google para que te encuentren sin pagar el clic"
+    ],
+    [
+      "Escala",
+      "Ads"
+    ],
+    [
+      "$234.999 ARS",
+      "USD 200–350"
+    ],
+    [
+      "$176.249,25 ARS",
+      "USD 200–350"
+    ],
+    [
+      "$2.114.991 ARS por año",
+      "+ pauta sugerida USD 300–600/mes"
+    ],
+    [
+      "Expandí tu negocio con más herramientas y funciones",
+      "Gestión de Google Ads y Meta Ads sobre una base que ya convierte"
+    ],
+    [
+      "Evolución",
+      "Sistemas a medida"
+    ],
+    [
+      "Un plan a medida para tu marca y asesoramiento exclusivo",
+      "Automatizaciones a medida: reservas, pedidos, cobros y atención"
+    ],
+    [
+      "Conocer más",
+      "Contanos qué necesitás"
+    ]
+  ],
+  "prefooter": [
+    [
+      "Formá parte de la plataforma",
+      "Contanos qué necesitás."
+    ],
+    [
+      "más grande de Latinoamérica",
+      "Una charla alcanza para saber si tiene sentido."
+    ],
+    [
+      "Habla con un especialista",
+      "Escribinos por WhatsApp"
+    ]
+  ],
+  "residual": [
+    [
+      "Tienda online",
+      "Diseño web"
+    ],
+    [
+      "Especialistas",
+      "Sistemas a medida"
+    ]
+  ]
+}
