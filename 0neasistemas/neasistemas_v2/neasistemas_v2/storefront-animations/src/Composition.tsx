@@ -1,0 +1,27 @@
+import { Composition } from "remotion";
+import { Step1Diagnosis } from "./Step1Diagnosis";
+import { Step2Roadmap } from "./Step2Roadmap";
+import { TOTAL_DURATION } from "./timing";
+
+export const MyComposition = () => {
+  return (
+    <>
+      <Composition
+        id="Step1Diagnosis"
+        component={Step1Diagnosis}
+        durationInFrames={TOTAL_DURATION}
+        fps={30}
+        width={1280}
+        height={800}
+      />
+      <Composition
+        id="Step2Roadmap"
+        component={Step2Roadmap}
+        durationInFrames={TOTAL_DURATION}
+        fps={30}
+        width={1280}
+        height={800}
+      />
+    </>
+  );
+};
