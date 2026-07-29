@@ -4,7 +4,7 @@
 Solo toca nodos de texto y atributos de texto (alt/aria-label/title/data-action).
 No toca clases, ni el orden del DOM, ni el CSS inline, ni el JS, ni los assets.
 """
-import json, os, re, sys
+import json, os, re, struct, sys
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 SRC = os.path.join(ROOT, "source.html")
@@ -59,6 +59,124 @@ def localize_assets(html):
     return re.sub(
         r"https://[^\s\"',]+\.(?:webp|jpe?g|png|gif|svg|ico|mp4|webm|css|js)[^\s\"',]*",
         swap, html)
+
+
+FAVICON = "assets/favicon-512.png"      # el original deja demasiado margen vacio
+LOGO_BLANCO = "assets/Nea_logo_blanco.png"
+LOGO_AZUL = "assets/Nea_logo_azul.png"
+
+HERO_H = 120          # el SVG original medía 83px de alto; el hero lo aguanta mas grande
+NAV_H = 52            # navbar: el SVG rendereaba a 42px; +10 como se pidio
+
+# Logos de una sola pieza (contenedor, archivo, alto en px).
+# El alto/ancho van inline porque el CSS del clon dimensiona `<svg>`, no `<img>`.
+LOGOS = (
+    (r'<div class="js-hp-hero-logo wg-hp-hero-logo"', LOGO_BLANCO, HERO_H),
+    (r'<div class="footer-brand-logo"', LOGO_AZUL, 63),
+)
+
+
+def png_size(rel_path):
+    """Ancho y alto del PNG, leidos del IHDR (los primeros 8 bytes del chunk)."""
+    with open(os.path.join(ROOT, rel_path.replace("/", os.sep)), "rb") as fh:
+        head = fh.read(24)
+    assert head[:8] == b"\x89PNG\r\n\x1a\n", f"no es PNG: {rel_path}"
+    return struct.unpack(">II", head[16:24])
+
+
+def logo_img(src, height, extra="", display="block"):
+    """<img> con alto fijo y ancho calculado del PNG (evita que se achate).
+
+    `display=""` deja la visibilidad al CSS (el navbar la alterna por estado; un
+    `display` inline ganaria sobre la hoja de estilos y romperia el swap).
+    """
+    nat_w, nat_h = png_size(src)
+    width = round(height * nat_w / nat_h)
+    disp = f"display:{display};" if display else ""
+    return (f'<img{extra} src="{src}" alt="NEASistemas"'
+            f' style="height:{height}px;width:{width}px;max-width:none;'
+            f'object-fit:contain;{disp}" />')
+
+
+def own_logos(html):
+    """Los wordmarks de Tiendanube (hero, navbar, footer) -> logo NEASistemas.
+
+    Cambia cada <svg> por un <img>, asi que se aplica despues del chequeo de
+    estructura: es una diferencia buscada, no una rotura del layout.
+    """
+    for container, src, height in LOGOS:
+        img = logo_img(src, height)
+        # `.*?` hasta el <svg>: algun atributo intermedio trae '>' (data-action).
+        html, n = re.subn(f"({container}.*?)<svg.*?</svg>",
+                          lambda m: m.group(1) + img, html, count=1, flags=re.S)
+        assert n == 1, f"logo no encontrado: {container}"
+
+    # El contenedor del hero esta clavado en 60px con overflow:hidden en el CSS:
+    # sin subirlo, un logo mas alto se recorta en vez de verse mas grande.
+    html, n = re.subn(
+        r'<div class="js-hp-hero-logo wg-hp-hero-logo"',
+        '<div style="height:{0}px;max-height:{0}px" '
+        'class="js-hp-hero-logo wg-hp-hero-logo"'.format(HERO_H),
+        html, count=1)
+    assert n == 1, "contenedor del logo del hero no encontrado"
+
+    html = own_navbar_logo(html)
+    return html
+
+
+# El SVG del navbar se recoloreaba solo con --header-logo-color (blanco sobre la
+# barra transparente, azul #0050c3 en la pildora blanca `is-scrolled`). Un <img>
+# PNG no hereda ese color, asi que se ponen los dos archivos y se alterna cual se
+# muestra con la misma clase de estado que ya usa el diseño.
+#
+# {slot} = ancho reservado al logo. El diseño tenia un `overflow:hidden` con una
+# animacion que abria el ancho de 0 a 160px; con el logo raster ese cierre cortaba
+# el final de "SISTEMAS". Se fija el ancho al del logo (con un respiro) y se deja
+# `overflow:visible` para que se vea completo.
+NAV_LOGO_STYLE = """
+<style>
+/* Logo NEASistemas del navbar: centrado vertical, completo, y swap blanco->azul. */
+.navbar-full .navbar .navbar-logo,
+.navbar-full .navbar .navbar-logo .row,
+.navbar-full .navbar .navbar-logo-img{{width:{slot}px !important;max-width:none !important;
+  overflow:visible !important}}
+.navbar-full .navbar .navbar-logo{{animation:none !important}}
+.navbar-full .navbar .navbar-logo-img{{margin:0 !important;padding:0 !important;
+  display:flex;align-items:center;height:var(--header-height)}}
+.navbar-full .navbar .navbar-logo-img a{{display:flex;align-items:center;height:100%}}
+.nea-navbar-logo--blanco{{display:block}}
+.nea-navbar-logo--azul{{display:none}}
+.navbar-full.navbar-pill.is-scrolled .navbar .nea-navbar-logo--blanco{{display:none}}
+.navbar-full.navbar-pill.is-scrolled .navbar .nea-navbar-logo--azul{{display:block}}
+</style>
+</head>"""
+
+
+def own_navbar_logo(html):
+    """Reemplaza el SVG del navbar por los dos PNG (blanco/azul) con su CSS.
+
+    Sin `display` inline: la visibilidad la decide la hoja de estilos segun el
+    estado (blanco por defecto, azul en la pildora `is-scrolled`).
+    """
+    nat_w, nat_h = png_size(LOGO_BLANCO)
+    slot = round(NAV_H * nat_w / nat_h) + 6      # ancho del logo + respiro
+    blanco = logo_img(LOGO_BLANCO, NAV_H,
+                      ' class="nea-navbar-logo nea-navbar-logo--blanco"', display="")
+    azul = logo_img(LOGO_AZUL, NAV_H,
+                    ' class="nea-navbar-logo nea-navbar-logo--azul"', display="")
+    html, n = re.subn(r'(<div class="navbar-logo-img.*?)<svg.*?</svg>',
+                      lambda m: m.group(1) + blanco + azul, html, count=1, flags=re.S)
+    assert n == 1, "logo del navbar no encontrado"
+    html, n = re.subn(r"</head>", NAV_LOGO_STYLE.format(slot=slot), html, count=1)
+    assert n == 1, "</head> no encontrado para el CSS del logo del navbar"
+    return html
+
+
+def own_favicon(html):
+    """El <link rel="shortcut icon"> seguia apuntando al favicon de Tiendanube."""
+    return re.sub(
+        r'(<link[^>]*\brel="shortcut icon"[^>]*\bhref=")[^"]*(")',
+        r"\g<1>" + FAVICON + r"\g<2>", html)
 
 
 SCHEMA = """{"@context":"https://schema.org","@graph":[
@@ -154,10 +272,14 @@ def main():
                   'href="#"', html)
 
     html = detach_third_party(html)
+    html = own_favicon(html)
 
     after = structure(html)
     for name, a, b in zip(("tags", "clases", "secciones"), before, after):
         assert a == b, f"ESTRUCTURA ROTA en {name}"
+
+    # Los logos cambian <svg> por <img>: van despues del chequeo, a proposito.
+    html = own_logos(html)
 
     open(OUT, "w", encoding="utf-8").write(html)
 
