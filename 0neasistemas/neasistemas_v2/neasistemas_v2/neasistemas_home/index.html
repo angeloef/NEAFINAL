@@ -194,7 +194,7 @@ f=false,w=window,d=document,v=d.querySelector('#vwoCode'),cK='_vwo_'+account_id+
 </script>
 
 <style>
-/* Logo NEASistemas del navbar: centrado vertical, completo, y swap blanco->azul. */
+/* Logo NEASistemas del navbar: centrado vertical y completo (siempre blanco). */
 .navbar-full .navbar .navbar-logo,
 .navbar-full .navbar .navbar-logo .row,
 .navbar-full .navbar .navbar-logo-img{width:160px !important;max-width:none !important;
@@ -203,10 +203,51 @@ f=false,w=window,d=document,v=d.querySelector('#vwoCode'),cK='_vwo_'+account_id+
 .navbar-full .navbar .navbar-logo-img{margin:0 !important;padding:0 !important;
   display:flex;align-items:center;height:var(--header-height)}
 .navbar-full .navbar .navbar-logo-img a{display:flex;align-items:center;height:100%}
-.nea-navbar-logo--blanco{display:block}
-.nea-navbar-logo--azul{display:none}
-.navbar-full.navbar-pill.is-scrolled .navbar .nea-navbar-logo--blanco{display:none}
-.navbar-full.navbar-pill.is-scrolled .navbar .nea-navbar-logo--azul{display:block}
+</style>
+
+<style>
+/* Color principal: azul -> #080808. */
+:root{
+  --primary-nimbus-blue:#080808;
+  --primary-nimbus-blue-rgb:8,8,8;
+  --primary-dark-blue:#080808;
+  --primary-dark-blue-rgb:8,8,8;
+  --secondary-deep-blue:#080808;
+  --secondary-deep-blue-rgb:8,8,8;
+  --color-light-ai-gradient-blue-high:#080808;
+  --color-dark-ai-gradient-blue-high:#080808;
+  --primary-blue-transparent-gradient:linear-gradient(180deg,#080808 0%,rgba(8,8,8,0.7) 100%);
+  --primary-clear-blue-gradient:linear-gradient(180deg,rgba(8,8,8,0.10) 0%,rgba(8,8,8,0.30) 100%);
+  --primary-clear-blue-transparent-gradient:linear-gradient(180deg,rgba(8,8,8,0.40) 0%,rgba(8,8,8,0.20) 100%);
+}
+/* Pildora del navbar: era blanca; en negro el logo blanco se lee. */
+.navbar-full.navbar-pill.is-scrolled .navbar{
+  --pill-bg:rgba(8,8,8,0.92);
+  --pill-border:1px solid rgba(255,255,255,0.15);
+  --nav-link-color:#fff;
+  --nav-link-color-hover:rgba(255,255,255,0.7);
+  --header-logo-color:#fff;
+}
+.navbar-full.navbar-pill.is-scrolled .navbar .navbar-nav[data-level='0']{background-color:transparent}
+/* Footer: mismo motivo que la pildora. El texto venia en gris oscuro (#1c1c1c)
+   desde reglas mas especificas, por eso el color va con !important sobre todo
+   el arbol; los SVG heredan via currentColor. */
+footer{background-color:#080808 !important;--footer-accent:#fff}
+footer,footer *{color:#fff !important;border-color:rgba(255,255,255,0.2)}
+footer hr{background-color:rgba(255,255,255,0.2)}
+footer .btn-primary,footer .hs-button{background-color:#fff !important}
+footer .btn-primary,footer .btn-primary *,
+footer .hs-button,footer .hs-button *{color:#080808 !important}
+</style>
+
+<style>
+@font-face{font-family:'DotGothic16';font-style:normal;font-weight:400;
+  font-display:swap;src:url(assets/DotGothic16-Regular.woff2) format('woff2')}
+/* Texto animado del hero (efecto de escritura) + su cursor. */
+.wg-hp-hero-typing,
+.wg-hp-hero-typing-text,
+.wg-hp-hero-typing-cursor{font-family:'DotGothic16',ui-monospace,monospace;
+  font-style:normal !important}
 </style>
 </head>
 <body class="home wp-singular page-template page-template-template-homepage page-template-template-homepage-php page page-id-16542 wp-theme-tiendanube-insti homepage-redesign navbar-fixed-padding elementor-default elementor-kit-5 elementor-page elementor-page-16542">
@@ -231,7 +272,7 @@ document.addEventListener('load', function(e) {
                             class="js-ga-trigger"
                             data-category="<global><menu>"
                             data-action="<clicked><logo_go_to_home>">
-                                                    <img class="nea-navbar-logo nea-navbar-logo--blanco" src="assets/Nea_logo_blanco.png" alt="NEASistemas" style="height:52px;width:154px;max-width:none;object-fit:contain;" /><img class="nea-navbar-logo nea-navbar-logo--azul" src="assets/Nea_logo_azul.png" alt="NEASistemas" style="height:52px;width:154px;max-width:none;object-fit:contain;" />
+                                                    <img class="nea-navbar-logo" src="assets/Nea_logo_blanco.png" alt="NEASistemas" style="height:52px;width:154px;max-width:none;object-fit:contain;display:block;" />
                                                     </a>
                                             </div>
                                             <div class="col-3 d-md-none pe-0">
@@ -2760,7 +2801,7 @@ El sistema para que tu negocio">
 
     <section class="footer-bottom d-flex flex-column flex-md-row align-items-center py-4 py-md-5">
         <div class="col-md d-flex justify-content-md-end">
-          <div class="footer-brand-logo"><img src="assets/Nea_logo_azul.png" alt="NEASistemas" style="height:63px;width:186px;max-width:none;object-fit:contain;display:block;" /></div>
+          <div class="footer-brand-logo"><img src="assets/Nea_logo_blanco.png" alt="NEASistemas" style="height:63px;width:186px;max-width:none;object-fit:contain;display:block;" /></div>
         </div>
     </section>
   </div>

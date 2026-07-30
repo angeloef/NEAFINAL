@@ -72,7 +72,7 @@ NAV_H = 52            # navbar: el SVG rendereaba a 42px; +10 como se pidio
 # El alto/ancho van inline porque el CSS del clon dimensiona `<svg>`, no `<img>`.
 LOGOS = (
     (r'<div class="js-hp-hero-logo wg-hp-hero-logo"', LOGO_BLANCO, HERO_H),
-    (r'<div class="footer-brand-logo"', LOGO_AZUL, 63),
+    (r'<div class="footer-brand-logo"', LOGO_BLANCO, 63),
 )
 
 
@@ -121,21 +121,19 @@ def own_logos(html):
     assert n == 1, "contenedor del logo del hero no encontrado"
 
     html = own_navbar_logo(html)
+    # Despues del CSS del navbar: en igualdad de especificidad, gana el ultimo.
+    html = own_theme(html)
+    html = own_typing_font(html)
     return html
 
 
-# El SVG del navbar se recoloreaba solo con --header-logo-color (blanco sobre la
-# barra transparente, azul #0050c3 en la pildora blanca `is-scrolled`). Un <img>
-# PNG no hereda ese color, asi que se ponen los dos archivos y se alterna cual se
-# muestra con la misma clase de estado que ya usa el diseño.
-#
 # {slot} = ancho reservado al logo. El diseño tenia un `overflow:hidden` con una
 # animacion que abria el ancho de 0 a 160px; con el logo raster ese cierre cortaba
 # el final de "SISTEMAS". Se fija el ancho al del logo (con un respiro) y se deja
 # `overflow:visible` para que se vea completo.
 NAV_LOGO_STYLE = """
 <style>
-/* Logo NEASistemas del navbar: centrado vertical, completo, y swap blanco->azul. */
+/* Logo NEASistemas del navbar: centrado vertical y completo (siempre blanco). */
 .navbar-full .navbar .navbar-logo,
 .navbar-full .navbar .navbar-logo .row,
 .navbar-full .navbar .navbar-logo-img{{width:{slot}px !important;max-width:none !important;
@@ -144,31 +142,98 @@ NAV_LOGO_STYLE = """
 .navbar-full .navbar .navbar-logo-img{{margin:0 !important;padding:0 !important;
   display:flex;align-items:center;height:var(--header-height)}}
 .navbar-full .navbar .navbar-logo-img a{{display:flex;align-items:center;height:100%}}
-.nea-navbar-logo--blanco{{display:block}}
-.nea-navbar-logo--azul{{display:none}}
-.navbar-full.navbar-pill.is-scrolled .navbar .nea-navbar-logo--blanco{{display:none}}
-.navbar-full.navbar-pill.is-scrolled .navbar .nea-navbar-logo--azul{{display:block}}
 </style>
 </head>"""
 
 
 def own_navbar_logo(html):
-    """Reemplaza el SVG del navbar por los dos PNG (blanco/azul) con su CSS.
-
-    Sin `display` inline: la visibilidad la decide la hoja de estilos segun el
-    estado (blanco por defecto, azul en la pildora `is-scrolled`).
-    """
+    """Reemplaza el SVG del navbar por el PNG blanco de NEASistemas."""
     nat_w, nat_h = png_size(LOGO_BLANCO)
     slot = round(NAV_H * nat_w / nat_h) + 6      # ancho del logo + respiro
-    blanco = logo_img(LOGO_BLANCO, NAV_H,
-                      ' class="nea-navbar-logo nea-navbar-logo--blanco"', display="")
-    azul = logo_img(LOGO_AZUL, NAV_H,
-                    ' class="nea-navbar-logo nea-navbar-logo--azul"', display="")
+    blanco = logo_img(LOGO_BLANCO, NAV_H, ' class="nea-navbar-logo"')
     html, n = re.subn(r'(<div class="navbar-logo-img.*?)<svg.*?</svg>',
-                      lambda m: m.group(1) + blanco + azul, html, count=1, flags=re.S)
+                      lambda m: m.group(1) + blanco, html, count=1, flags=re.S)
     assert n == 1, "logo del navbar no encontrado"
     html, n = re.subn(r"</head>", NAV_LOGO_STYLE.format(slot=slot), html, count=1)
     assert n == 1, "</head> no encontrado para el CSS del logo del navbar"
+    return html
+
+
+# El texto que se "tipea" en el hero venia en Ivy Presto (serif italica). Se pasa
+# a DotGothic16, auto-hospedada en assets/ igual que el resto de las fuentes del
+# proyecto (subset latin de Google Fonts, woff2). Solo trae un peso y ninguna
+# italica: el `font-style:normal` la saca (si no, el navegador la inclina el solo).
+TYPING_FONT_STYLE = """
+<style>
+@font-face{font-family:'DotGothic16';font-style:normal;font-weight:400;
+  font-display:swap;src:url(assets/DotGothic16-Regular.woff2) format('woff2')}
+/* Texto animado del hero (efecto de escritura) + su cursor. */
+.wg-hp-hero-typing,
+.wg-hp-hero-typing-text,
+.wg-hp-hero-typing-cursor{font-family:'DotGothic16',ui-monospace,monospace;
+  font-style:normal !important}
+</style>
+</head>"""
+
+
+def own_typing_font(html):
+    """DotGothic16 (sin italica) para el texto animado del hero."""
+    html, n = re.subn(r"</head>", TYPING_FONT_STYLE, html, count=1)
+    assert n == 1, "</head> no encontrado para la fuente del texto animado"
+    return html
+
+
+NEGRO = "#080808"
+NEGRO_RGB = "8,8,8"
+
+# El azul de marca vivia en variables CSS (--primary-nimbus-blue #0050c3 pintaba
+# hero, brands, planes y flechas; --primary-dark-blue #171E43 los paneles sticky).
+# Se redefinen en :root en vez de buscar y reemplazar cada color suelto.
+# La pildora del navbar y el footer eran blancos: con el logo unicamente en blanco
+# quedarian invisibles, asi que pasan a negro y su texto a blanco.
+THEME_STYLE = """
+<style>
+/* Color principal: azul -> {negro}. */
+:root{{
+  --primary-nimbus-blue:{negro};
+  --primary-nimbus-blue-rgb:{negro_rgb};
+  --primary-dark-blue:{negro};
+  --primary-dark-blue-rgb:{negro_rgb};
+  --secondary-deep-blue:{negro};
+  --secondary-deep-blue-rgb:{negro_rgb};
+  --color-light-ai-gradient-blue-high:{negro};
+  --color-dark-ai-gradient-blue-high:{negro};
+  --primary-blue-transparent-gradient:linear-gradient(180deg,{negro} 0%,rgba({negro_rgb},0.7) 100%);
+  --primary-clear-blue-gradient:linear-gradient(180deg,rgba({negro_rgb},0.10) 0%,rgba({negro_rgb},0.30) 100%);
+  --primary-clear-blue-transparent-gradient:linear-gradient(180deg,rgba({negro_rgb},0.40) 0%,rgba({negro_rgb},0.20) 100%);
+}}
+/* Pildora del navbar: era blanca; en negro el logo blanco se lee. */
+.navbar-full.navbar-pill.is-scrolled .navbar{{
+  --pill-bg:rgba({negro_rgb},0.92);
+  --pill-border:1px solid rgba(255,255,255,0.15);
+  --nav-link-color:#fff;
+  --nav-link-color-hover:rgba(255,255,255,0.7);
+  --header-logo-color:#fff;
+}}
+.navbar-full.navbar-pill.is-scrolled .navbar .navbar-nav[data-level='0']{{background-color:transparent}}
+/* Footer: mismo motivo que la pildora. El texto venia en gris oscuro (#1c1c1c)
+   desde reglas mas especificas, por eso el color va con !important sobre todo
+   el arbol; los SVG heredan via currentColor. */
+footer{{background-color:{negro} !important;--footer-accent:#fff}}
+footer,footer *{{color:#fff !important;border-color:rgba(255,255,255,0.2)}}
+footer hr{{background-color:rgba(255,255,255,0.2)}}
+footer .btn-primary,footer .hs-button{{background-color:#fff !important}}
+footer .btn-primary,footer .btn-primary *,
+footer .hs-button,footer .hs-button *{{color:{negro} !important}}
+</style>
+</head>"""
+
+
+def own_theme(html):
+    """Redefine el azul de marca a negro y oscurece pildora y footer."""
+    style = THEME_STYLE.format(negro=NEGRO, negro_rgb=NEGRO_RGB)
+    html, n = re.subn(r"</head>", style, html, count=1)
+    assert n == 1, "</head> no encontrado para el tema negro"
     return html
 
 
