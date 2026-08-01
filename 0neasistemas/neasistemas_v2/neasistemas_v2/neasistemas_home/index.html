@@ -1856,7 +1856,10 @@ El sistema para que tu negocio">
 
     var coarse = window.matchMedia('(pointer: coarse)').matches;
     // phones carry a third of the nodes and skip the pointer field entirely
-    var COUNT = coarse ? 48 : (window.innerWidth < 900 ? 96 : 156);
+    var COUNT = coarse ? 62 : (window.innerWidth < 900 ? 126 : 196);
+    var REST_CARD = .46;    // how much speed survives a bounce off a card edge
+    var REST_P = .62;       // ... and off another particle
+    var SLIDE = .985;       // tangential survival, so they skate along an edge instead of sticking
     /* The push and the spring fight each other: a particle parks where PUSH*falloff*z equals
        SPRING*displacement, so these two numbers set how wide the hole around the cursor opens
        (~80px at half-radius here). Raising SPRING tightens the field back up but shrinks the
@@ -1947,6 +1950,100 @@ El sistema para que tu negocio">
         ctx.restore();
     }
 
+    /* Card collision. The gallery translates .js-hpg-track in the DOM, so the cards' own
+       rects are the truth on screen in both the WebGL and the fallback layout — no need to
+       mirror the GL transform. Their per-frame horizontal speed is handed to whatever they
+       hit, which is what makes a card read as plowing through the confetti instead of
+       teleporting past it. */
+    var cardEls = [].slice.call(section.querySelectorAll('.js-hpg-card'));
+    var cards = cardEls.map(function () { return { x0: 0, y0: 0, x1: 0, y1: 0, vx: 0, prev: null, on: false }; });
+
+    function readCards() {
+        var base = canvas.getBoundingClientRect();
+        for (var i = 0; i < cardEls.length; i++) {
+            var r = cardEls[i].getBoundingClientRect(), c = cards[i];
+            c.on = r.width > 0 && r.right > base.left - 200 && r.left < base.right + 200 &&
+                r.bottom > base.top && r.top < base.bottom;
+            if (!c.on) { c.prev = null; c.vx = 0; continue; }
+            var left = r.left - base.left;
+            c.vx = c.prev === null ? 0 : left - c.prev;
+            c.prev = left;
+            c.x0 = left; c.x1 = left + r.width;
+            c.y0 = r.top - base.top; c.y1 = c.y0 + r.height;
+        }
+    }
+
+    /* An anchor that falls under a card would press its particle into the edge for as long
+       as the card sits there, and the whole gallery would wear a static dotted outline. So
+       the spring target gets evicted too — same shallowest-axis push, applied to the point
+       the particle is aiming at rather than to the particle. The result is a loose dusting
+       that a passing card sweeps aside, not a pile-up. Returns [x, y]. */
+    var tgt = [0, 0];
+    function evict(x, y, pad) {
+        for (var i = 0; i < cards.length; i++) {
+            var c = cards[i];
+            if (!c.on) continue;
+            if (x < c.x0 - pad || x > c.x1 + pad || y < c.y0 - pad || y > c.y1 + pad) continue;
+            var dl = x - (c.x0 - pad), dr = (c.x1 + pad) - x;
+            var dt = y - (c.y0 - pad), db = (c.y1 + pad) - y;
+            var m = Math.min(dl, dr, dt, db);
+            if (m === dl) x = c.x0 - pad;
+            else if (m === dr) x = c.x1 + pad;
+            else if (m === dt) y = c.y0 - pad;
+            else y = c.y1 + pad;
+        }
+        tgt[0] = x; tgt[1] = y;
+        return tgt;
+    }
+
+    /* Circle vs AABB, resolved on the shallowest axis: push the particle back out to the
+       edge it came closest to crossing, flip that velocity component, keep most of the
+       tangential one so it slides. */
+    function hitCards(p, rad) {
+        for (var i = 0; i < cards.length; i++) {
+            var c = cards[i];
+            if (!c.on) continue;
+            if (p.x < c.x0 - rad || p.x > c.x1 + rad || p.y < c.y0 - rad || p.y > c.y1 + rad) continue;
+            var dl = p.x - (c.x0 - rad), dr = (c.x1 + rad) - p.x;
+            var dt = p.y - (c.y0 - rad), db = (c.y1 + rad) - p.y;
+            var m = Math.min(dl, dr, dt, db);
+            if (m === dl) { p.x = c.x0 - rad; if (p.vx > 0) p.vx = -p.vx * REST_CARD; p.vx += c.vx * .55; p.vy *= SLIDE; }
+            else if (m === dr) { p.x = c.x1 + rad; if (p.vx < 0) p.vx = -p.vx * REST_CARD; p.vx += c.vx * .55; p.vy *= SLIDE; }
+            else if (m === dt) { p.y = c.y0 - rad; if (p.vy > 0) p.vy = -p.vy * REST_CARD; p.vx = p.vx * SLIDE + c.vx * .55; }
+            else { p.y = c.y1 + rad; if (p.vy < 0) p.vy = -p.vy * REST_CARD; p.vx = p.vx * SLIDE + c.vx * .55; }
+            p.spin += (p.vx * .0012 - p.spin) * .3;
+        }
+    }
+
+    /* Equal-mass impulse along the contact normal, plus positional relaxation so a pile
+       doesn't sink into itself.
+       ponytail: O(n²) over ~200 particles is ~20k rejects per frame and measures flat here;
+       swap in a uniform grid if the count ever goes past ~400. */
+    function collide() {
+        for (var i = 0; i < parts.length; i++) {
+            var a = parts[i], ar = a.size * .5;
+            for (var j = i + 1; j < parts.length; j++) {
+                var b = parts[j];
+                var dx = b.x - a.x, dy = b.y - a.y;
+                var rs = ar + b.size * .5;
+                if (dx > rs || dx < -rs || dy > rs || dy < -rs) continue;   // cheap AABB reject first
+                var d2 = dx * dx + dy * dy;
+                if (d2 >= rs * rs || d2 === 0) continue;
+                var d = Math.sqrt(d2), nx = dx / d, ny = dy / d;
+                var push = (rs - d) * .5;
+                a.x -= nx * push; a.y -= ny * push;
+                b.x += nx * push; b.y += ny * push;
+                var rel = (b.vx - a.vx) * nx + (b.vy - a.vy) * ny;
+                if (rel < 0) {
+                    var imp = rel * REST_P;
+                    a.vx += imp * nx; a.vy += imp * ny;
+                    b.vx -= imp * nx; b.vy -= imp * ny;
+                    a.spin -= imp * .004; b.spin += imp * .004;
+                }
+            }
+        }
+    }
+
     var fade = 0, running = false, last = 0;
 
     function frame(now) {
@@ -1962,7 +2059,7 @@ El sistema para que tu negocio">
         if (hasPointer) { pvx = (tpx - px) * .22; pvy = (tpy - py) * .22; px += pvx; py += pvy; }
         else { pvx = pvy = 0; }
 
-        ctx.clearRect(0, 0, W, H);
+        readCards();
 
         for (var i = 0; i < parts.length; i++) {
             var p = parts[i];
@@ -1970,6 +2067,8 @@ El sistema para que tu negocio">
             var t = now * p.spd;
             var bx = p.ax * W + Math.cos(t + p.ph) * p.orb;
             var by = p.ay * H + Math.sin(t * 1.3 + p.ph) * p.orb - prog * PARALLAX * p.z;
+            // a target under a card is relocated to the nearest free edge (see evict)
+            var g = evict(bx, by, 26); bx = g[0]; by = g[1];
 
             if (hasPointer) {
                 var dx = p.x - px, dy = p.y - py, d2 = dx * dx + dy * dy;
@@ -1991,9 +2090,15 @@ El sistema para que tu negocio">
             // spin settles back toward its lazy idle rate instead of ringing forever
             p.spin += (0 - p.spin) * .012;
             p.rot += (p.spin + Math.hypot(p.vx, p.vy) * .002) * dt;
-
-            draw(p);
         }
+
+        // pairs first, cards last: a pile shoved by its neighbours still can't end the frame
+        // inside a card
+        collide();
+        for (var c2 = 0; c2 < parts.length; c2++) hitCards(parts[c2], parts[c2].size * .5);
+
+        ctx.clearRect(0, 0, W, H);
+        for (var k = 0; k < parts.length; k++) draw(parts[k]);
         requestAnimationFrame(frame);
     }
 
