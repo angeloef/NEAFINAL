@@ -1399,12 +1399,14 @@ El sistema para que tu negocio">
         --hpg-vermilion: #F63E02;
         --hpg-blue: #246EB9;
         --hpg-line: rgba(239, 236, 231, .16);
-        /* The card is driven by viewport WIDTH now, not height: it has to land on the left
-           band and stop a little past the midline, and that is a horizontal statement. The
-           height follows the 4:3 media but is capped so a short landscape window never pushes
-           the label off screen. */
-        --hpg-card-w: clamp(280px, 56vw, 1040px);
-        --hpg-h: min(72vh, calc(var(--hpg-card-w) * 3 / 4));
+        /* The card is driven by viewport WIDTH, not height: it has to land on the left band
+           and stop a little past the midline, and that is a horizontal statement.
+           The ratio is the RENDERS' own 16:10 (1280x800) — at 4:3 object-fit was cropping 17%
+           of every mockup's width, which is exactly the frame that makes a browser mockup
+           read as a screen. The height cap is applied to the WIDTH so the ratio never breaks
+           on a short window; capping the height instead is what reintroduces the crop. */
+        --hpg-card-w: min(clamp(280px, 56vw, 1040px), calc(72vh * 8 / 5));
+        --hpg-h: calc(var(--hpg-card-w) * 5 / 8);
         --hpg-pad: clamp(20px, 2.4vw, 38px);
         position: relative;
         background: #000;
@@ -1486,7 +1488,10 @@ El sistema para que tu negocio">
         position: relative;
         z-index: 2;
         display: flex;
-        gap: clamp(1.5rem, 3vw, 3rem);
+        /* Wide on purpose. With the old gap the next card showed 64% of itself and the two
+           fought for the eye; at ~29vw only a fifth of it peeks in, which reads as a promise
+           instead of a competitor. The gutter is not empty — the confetti lives there. */
+        gap: clamp(80px, 29vw, 480px);
         /* the left padding IS the anchor: it decides where the focus band sits, and the
            script derives its reference point from the first card instead of hardcoding it */
         padding: 0 clamp(20px, 4vw, 72px);
@@ -1496,12 +1501,23 @@ El sistema para que tu negocio">
 
     /* card width is locked to the 4:3 media so the GL planes and the DOM overlay stay aligned.
        No border-radius anywhere: the WebGL planes are hard rectangles and would give it away. */
+    /* The card is no longer the clipping box — .hpg__media is. That split is what lets the
+       "01 — Analizar" line sit on the black above the frame instead of on top of a white
+       mockup, where it was measuring 2.4:1 against white type. */
     .hpg__card {
         position: relative;
         flex-shrink: 0;
         margin: 0;
         width: var(--hpg-card-w);
         max-width: 88vw;
+        display: flex;
+        flex-direction: column;
+        gap: clamp(10px, 1.4vh, 18px);
+    }
+
+    .hpg__media {
+        position: relative;
+        width: 100%;
         height: var(--hpg-h);
         overflow: hidden;
         outline: 1px solid var(--hpg-line);
@@ -1514,21 +1530,25 @@ El sistema para que tu negocio">
 
     .hpg__scrim {
         position: absolute; inset: 0; z-index: 2; pointer-events: none;
-        background:
-            linear-gradient(to top, rgba(0,0,0,.9) 0%, rgba(0,0,0,.62) 26%, rgba(0,0,0,.12) 58%, rgba(0,0,0,0) 78%),
-            linear-gradient(to bottom, rgba(0,0,0,.55) 0%, rgba(0,0,0,0) 34%);
+        /* bottom only: the top gradient existed to rescue the index/stage line, and that line
+           has moved off the media entirely */
+        background: linear-gradient(to top, rgba(0,0,0,.92) 0%, rgba(0,0,0,.66) 28%, rgba(0,0,0,.12) 62%, rgba(0,0,0,0) 82%);
     }
 
     /* text layer: one absolutely-positioned grid over the media, every line its own element
        so future per-element effects have something to grab */
-    .hpg__label {
-        position: absolute; inset: 0; z-index: 3;
-        display: flex; flex-direction: column; justify-content: space-between;
+    /* index + stage: outside the frame, straight on the black */
+    .hpg__label-top {
+        display: flex; align-items: baseline; gap: clamp(12px, 1.4vw, 20px);
+        pointer-events: none;
+    }
+    /* copy: still inside the frame, where the scrim gives it a floor to stand on */
+    .hpg__label-bottom {
+        position: absolute; left: 0; right: 0; bottom: 0; z-index: 3;
+        display: flex; flex-direction: column; align-items: flex-start;
         padding: var(--hpg-pad);
         pointer-events: none;
     }
-    .hpg__label-top { display: flex; align-items: baseline; gap: clamp(12px, 1.4vw, 20px); }
-    .hpg__label-bottom { display: flex; flex-direction: column; align-items: flex-start; }
 
     .hpg__index {
         font-size: clamp(2rem, 3.4vw, 3.25rem);
@@ -1565,13 +1585,14 @@ El sistema para que tu negocio">
     .hpg__rule { width: 100%; height: 1px; margin: 0 0 clamp(14px, 1.8vh, 22px); background: var(--hpg-line); transform-origin: left; }
 
     /* card focus state: the panel nearest the centre of the viewport carries the copy */
-    .hpg__label > * > *, .hpg__rule {
+    .hpg__label-top > *, .hpg__label-bottom > *, .hpg__rule {
         opacity: 0;
         transform: translateY(14px);
         transition: opacity .6s cubic-bezier(.16, 1, .3, 1), transform .6s cubic-bezier(.16, 1, .3, 1);
         transition-delay: calc(var(--i, 0) * 70ms);
     }
-    .hpg__card.is-active .hpg__label > * > *,
+    .hpg__card.is-active .hpg__label-top > *,
+    .hpg__card.is-active .hpg__label-bottom > *,
     .hpg__card.is-active .hpg__rule { opacity: 1; transform: none; }
     .hpg__card .hpg__scrim { opacity: .55; transition: opacity .6s ease; }
     .hpg__card.is-active .hpg__scrim { opacity: 1; }
@@ -1607,9 +1628,11 @@ El sistema para que tu negocio">
         padding: clamp(48px, 8vh, 96px) clamp(1.25rem, 5vw, 3rem);
         transform: none !important;
     }
-    .hpg:not(.is-gl) .hpg__card { width: min(100%, 720px); max-width: 100%; height: auto; aspect-ratio: 4 / 3; }
+    .hpg:not(.is-gl) .hpg__card { width: min(100%, 720px); max-width: 100%; }
+    .hpg:not(.is-gl) .hpg__media { height: auto; aspect-ratio: 8 / 5; }
     .hpg:not(.is-gl) .hpg__meta { display: none; }
-    .hpg:not(.is-gl) .hpg__label > * > *,
+    .hpg:not(.is-gl) .hpg__label-top > *,
+    .hpg:not(.is-gl) .hpg__label-bottom > *,
     .hpg:not(.is-gl) .hpg__rule { opacity: 1; transform: none; }
 
     @media (max-width: 991px) {
@@ -1618,7 +1641,7 @@ El sistema para que tu negocio">
 
     @media (prefers-reduced-motion: reduce) {
         .hpg__hint span { animation: none; }
-        .hpg__label > * > *, .hpg__rule { transition: none; }
+        .hpg__label-top > *, .hpg__label-bottom > *, .hpg__rule { transition: none; }
     }
     .reduced-motion .hpg__hint span { animation: none; }
 </style>
@@ -1643,6 +1666,11 @@ El sistema para que tu negocio">
             <div class="js-hpg-track hpg__track">
 
                 <article class="js-hpg-card hpg__card" aria-label="Paso 1: Analizamos tu negocio">
+                        <div class="hpg__label-top">
+                        <span class="hpg__index" style="--i:0" aria-hidden="true">01</span>
+                        <span class="hpg__stage" style="--i:1">Analizar</span>
+                    </div>
+                    <div class="hpg__media">
                     <!-- render de storefront-animations/src/Step1Diagnosis.tsx -->
                     <video class="js-hpg-img hpg__img" poster="assets/storefront-layout-poster.webp"
                         width="1280" height="800" autoplay muted loop playsinline preload="auto"
@@ -1651,20 +1679,20 @@ El sistema para que tu negocio">
                         <source src="assets/storefront-layout.mp4" type="video/mp4" />
                     </video>
                     <div class="hpg__scrim" aria-hidden="true"></div>
-                    <div class="hpg__label">
-                        <div class="hpg__label-top">
-                            <span class="hpg__index" style="--i:0" aria-hidden="true">01</span>
-                            <span class="hpg__stage" style="--i:1">Analizar</span>
-                        </div>
                         <div class="hpg__label-bottom">
-                            <i class="hpg__rule" style="--i:2" aria-hidden="true"></i>
-                            <h3 class="hpg__name" style="--i:3">Analizamos tu negocio</h3>
-                            <p class="hpg__desc" style="--i:4">Antes de diseñar nada entendemos cómo funciona tu negocio hoy: quién te compra, qué te diferencia, qué resolver primero.</p>
-                        </div>
+                        <i class="hpg__rule" style="--i:2" aria-hidden="true"></i>
+                        <h3 class="hpg__name" style="--i:3">Analizamos tu negocio</h3>
+                        <p class="hpg__desc" style="--i:4">Antes de diseñar nada entendemos cómo funciona tu negocio hoy: quién te compra, qué te diferencia, qué resolver primero.</p>
+                    </div>
                     </div>
                 </article>
 
                 <article class="js-hpg-card hpg__card" aria-label="Paso 2: Te mostramos el camino a seguir">
+                        <div class="hpg__label-top">
+                        <span class="hpg__index" style="--i:0" aria-hidden="true">02</span>
+                        <span class="hpg__stage" style="--i:1">Diseñar</span>
+                    </div>
+                    <div class="hpg__media">
                     <!-- render de storefront-animations/src/Step2Roadmap.tsx -->
                     <video class="js-hpg-img hpg__img" poster="assets/storefront-section-latam-poster.webp"
                         width="1280" height="800" autoplay muted loop playsinline preload="auto"
@@ -1673,33 +1701,28 @@ El sistema para que tu negocio">
                         <source src="assets/storefront-section-latam.mp4" type="video/mp4" />
                     </video>
                     <div class="hpg__scrim" aria-hidden="true"></div>
-                    <div class="hpg__label">
-                        <div class="hpg__label-top">
-                            <span class="hpg__index" style="--i:0" aria-hidden="true">02</span>
-                            <span class="hpg__stage" style="--i:1">Diseñar</span>
-                        </div>
                         <div class="hpg__label-bottom">
-                            <i class="hpg__rule" style="--i:2" aria-hidden="true"></i>
-                            <h3 class="hpg__name" style="--i:3">Te mostramos el camino a seguir</h3>
-                            <p class="hpg__desc" style="--i:4">Definimos el plan de acción para tu negocio y armamos una primera versión navegable, lista para afinar el diseño.</p>
-                        </div>
+                        <i class="hpg__rule" style="--i:2" aria-hidden="true"></i>
+                        <h3 class="hpg__name" style="--i:3">Te mostramos el camino a seguir</h3>
+                        <p class="hpg__desc" style="--i:4">Definimos el plan de acción para tu negocio y armamos una primera versión navegable, lista para afinar el diseño.</p>
+                    </div>
                     </div>
                 </article>
 
                 <article class="js-hpg-card hpg__card" aria-label="Paso 3: Construimos y medimos">
+                        <div class="hpg__label-top">
+                        <span class="hpg__index" style="--i:0" aria-hidden="true">03</span>
+                        <span class="hpg__stage" style="--i:1">Construir</span>
+                    </div>
+                    <div class="hpg__media">
                     <!-- TODO: reemplazar por el asset final de la etapa 3 -->
                     <img class="js-hpg-img hpg__img" src="assets/09.28544ed6.webp" alt="" draggable="false" width="1600" height="1200" />
                     <div class="hpg__scrim" aria-hidden="true"></div>
-                    <div class="hpg__label">
-                        <div class="hpg__label-top">
-                            <span class="hpg__index" style="--i:0" aria-hidden="true">03</span>
-                            <span class="hpg__stage" style="--i:1">Construir</span>
-                        </div>
                         <div class="hpg__label-bottom">
-                            <i class="hpg__rule" style="--i:2" aria-hidden="true"></i>
-                            <h3 class="hpg__name" style="--i:3">Construimos y medimos</h3>
-                            <p class="hpg__desc" style="--i:4">Con KPIs acordados antes de empezar. Facturamos la siguiente etapa cuando la anterior ya mostró resultado.</p>
-                        </div>
+                        <i class="hpg__rule" style="--i:2" aria-hidden="true"></i>
+                        <h3 class="hpg__name" style="--i:3">Construimos y medimos</h3>
+                        <p class="hpg__desc" style="--i:4">Con KPIs acordados antes de empezar. Facturamos la siguiente etapa cuando la anterior ya mostró resultado.</p>
+                    </div>
                     </div>
                 </article>
 
@@ -2152,6 +2175,11 @@ const PARALLAX_INTENSITY = 1.0;
 const UV_SCALE = 1.0;
 const SHADER_MULTIPLIER = 2.0;
 const EASE = 0.07;
+/* Page-scroll pixels spent per pixel of horizontal travel (see measure). The wide gutter
+   between cards nearly doubled the travel, so 0.6 barely dented the section height; 0.45
+   puts a card step at roughly half a viewport of scrolling. The section can never go below
+   head + one pinned viewport, which is the 1.6 screens underneath all of this. */
+const SCROLL_RATIO = 0.45;
 
 const section = document.querySelector('.hpg');
 if (section) init(section);
@@ -2280,12 +2308,16 @@ function init(section) {
         renderer.setSize(vw, vh, false);
 
         medias.forEach((m) => {
-            // offsets are read against the track box, so the layout stays scroll-independent
+            /* offsets are read against the track box, so the layout stays scroll-independent.
+               Both axes go through rects now: the media box is nested inside the card (the
+               index/stage line sits above it), so offsetTop would be measured from the card,
+               not from the track. */
             const media = m.el.parentElement;
+            const mr = media.getBoundingClientRect(), tr = track.getBoundingClientRect();
             m.w = media.offsetWidth;
             m.h = media.offsetHeight;
-            m.left = media.getBoundingClientRect().left - track.getBoundingClientRect().left;
-            m.top = media.offsetTop;
+            m.left = mr.left - tr.left;
+            m.top = mr.top - tr.top;
             m.mesh.scale.set(m.w, m.h, 1);
             m.material.uniforms.uResolution.value.set(m.w, m.h);
         });
@@ -2299,10 +2331,12 @@ function init(section) {
         const first = medias[0], lastM = medias[medias.length - 1];
         focusX = first ? first.left + first.w / 2 : vw / 2;
         limit = lastM ? Math.max(0, (lastM.left + lastM.w / 2) - focusX) : 0;
-        // one pixel of page scroll == one pixel of horizontal travel
+        /* Was one pixel of page scroll per pixel of horizontal travel, which cost 3.5
+           viewports of scrolling for three cards and felt like wading. At 0.6 the gallery
+           covers the same distance in ~2 viewports; below ~0.5 it starts to feel flung. */
         section.style.height = '';
         headH = head.offsetHeight;
-        section.style.height = (section.offsetHeight + limit) + 'px';
+        section.style.height = (section.offsetHeight + limit * SCROLL_RATIO) + 'px';
     }
 
     function onScroll() {
