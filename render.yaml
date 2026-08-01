@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: neasistemas-home
+    runtime: static
+    branch: main
+    staticPublishPath: 0neasistemas/neasistemas_v2/neasistemas_v2/neasistemas_home
