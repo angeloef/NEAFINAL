@@ -1405,7 +1405,7 @@ El sistema para que tu negocio">
            of every mockup's width, which is exactly the frame that makes a browser mockup
            read as a screen. The height cap is applied to the WIDTH so the ratio never breaks
            on a short window; capping the height instead is what reintroduces the crop. */
-        --hpg-card-w: min(clamp(280px, 56vw, 1040px), calc(72vh * 8 / 5));
+        --hpg-card-w: min(clamp(280px, 66vw, 1240px), calc(72vh * 8 / 5));
         --hpg-h: calc(var(--hpg-card-w) * 5 / 8);
         --hpg-pad: clamp(20px, 2.4vw, 38px);
         position: relative;
@@ -1488,15 +1488,15 @@ El sistema para que tu negocio">
         position: relative;
         z-index: 2;
         display: flex;
-        /* Wide on purpose. With the old gap the next card showed 64% of itself and the two
-           fought for the eye; at ~29vw only a fifth of it peeks in, which reads as a promise
-           instead of a competitor. The gutter is not empty — the confetti lives there. */
-        gap: clamp(80px, 29vw, 480px);
+        /* Sized so the next card always peeks by about a fifth of itself: that is
+           100 - 4(padding) - 66(card) - 12(the peek) in vw. It has to shrink when the card
+           grows, otherwise the neighbour falls off the right edge and the strip stops
+           reading as continuous. The gutter is not empty — the confetti lives there. */
+        gap: clamp(60px, 18vw, 340px);
         /* the left padding IS the anchor: it decides where the focus band sits, and the
            script derives its reference point from the first card instead of hardcoding it */
         padding: 0 clamp(20px, 4vw, 72px);
         width: max-content;
-        will-change: transform;
     }
 
     /* card width is locked to the 4:3 media so the GL planes and the DOM overlay stay aligned.
@@ -1513,6 +1513,8 @@ El sistema para que tu negocio">
         display: flex;
         flex-direction: column;
         gap: clamp(10px, 1.4vh, 18px);
+        /* each card is placed individually so it can be recycled around the strip */
+        will-change: transform;
     }
 
     .hpg__media {
@@ -2292,7 +2294,7 @@ function init(section) {
         }
         const mesh = new THREE.Mesh(geometry, material);
         group.add(mesh);
-        return { el, mesh, material, w: 1, h: 1, left: 0, top: 0 };
+        return { el, card: el.closest('.js-hpg-card'), mesh, material, w: 1, h: 1, left: 0, top: 0 };
     });
 
     const reduceMotion = document.documentElement.classList.contains('reduced-motion') ||
@@ -2316,10 +2318,14 @@ function init(section) {
         });
     }
 
-    let vw = 0, vh = 0, limit = 0, headH = 0, active = -1, focusX = 0;
+    let vw = 0, vh = 0, limit = 0, headH = 0, active = -1, focusX = 0, strip = 0;
     const scroll = { current: 0, target: 0 };
 
     function measure() {
+        // cards carry their own transform now (see render), so the rects below would be
+        // read mid-recycle unless we zero them first
+        cards.forEach((c) => { c.style.transform = 'none'; });
+
         vw = wrapper.clientWidth;
         vh = wrapper.clientHeight;
 
@@ -2353,6 +2359,10 @@ function init(section) {
         const first = medias[0], lastM = medias[medias.length - 1];
         focusX = first ? first.left + first.w / 2 : vw / 2;
         limit = lastM ? Math.max(0, (lastM.left + lastM.w / 2) - focusX) : 0;
+        /* One period of the strip = card + gutter, times the number of cards. Recycling a
+           card by exactly this distance puts it back where an identical fourth card would
+           have been, which is what sells the loop without cloning anything. */
+        strip = medias.length > 1 ? (medias[1].left - medias[0].left) * medias.length : 0;
         /* Was one pixel of page scroll per pixel of horizontal travel, which cost 3.5
            viewports of scrolling for three cards and felt like wading. At 0.6 the gallery
            covers the same distance in ~2 viewports; below ~0.5 it starts to feel flung. */
@@ -2394,11 +2404,24 @@ function init(section) {
         scroll.current += (scroll.target - scroll.current) * EASE;
         if (Math.abs(scroll.target - scroll.current) < 0.01) scroll.current = scroll.target;
 
-        track.style.transform = `translate3d(${-scroll.current}px,0,0)`;
+        /* The track no longer moves as one piece: each card is placed on its own so it can be
+           recycled independently. A card is wrapped forward by one strip period once its
+           right edge clears the left edge of the viewport by 40px — off screen, so the jump
+           is never witnessed — and reappears in the gutter on the right. With three cards the
+           strip is wider than the viewport, so the recycled one only shows up once the other
+           two have gone by: the gallery reads as endless in both directions while still being
+           three DOM nodes and three textures. */
+        track.style.transform = 'none';
 
         let nearest = 0, best = Infinity;
         medias.forEach((m, i) => {
-            const center = m.left - scroll.current + m.w / 2;
+            let x = m.left - scroll.current;
+            if (strip > 0) {
+                const minX = -(m.w + 40);
+                x = ((x - minX) % strip + strip) % strip + minX;
+            }
+            m.card.style.transform = `translate3d(${(x - m.left).toFixed(2)}px,0,0)`;
+            const center = x + m.w / 2;
             // the mesh still maps css x onto a camera centred on the viewport; only the
             // reference the distortion and the active pick are measured from moved left
             m.mesh.position.set(center - vw / 2, -m.top + vh / 2 - m.h / 2, 0);
