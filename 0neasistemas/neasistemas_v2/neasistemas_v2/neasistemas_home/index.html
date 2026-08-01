@@ -1399,7 +1399,12 @@ El sistema para que tu negocio">
         --hpg-vermilion: #F63E02;
         --hpg-blue: #246EB9;
         --hpg-line: rgba(239, 236, 231, .16);
-        --hpg-h: 66vh;
+        /* The card is driven by viewport WIDTH now, not height: it has to land on the left
+           band and stop a little past the midline, and that is a horizontal statement. The
+           height follows the 4:3 media but is capped so a short landscape window never pushes
+           the label off screen. */
+        --hpg-card-w: clamp(280px, 56vw, 1040px);
+        --hpg-h: min(72vh, calc(var(--hpg-card-w) * 3 / 4));
         --hpg-pad: clamp(20px, 2.4vw, 38px);
         position: relative;
         background: #000;
@@ -1482,7 +1487,9 @@ El sistema para que tu negocio">
         z-index: 2;
         display: flex;
         gap: clamp(1.5rem, 3vw, 3rem);
-        padding: 0 clamp(24px, 6vw, 120px);
+        /* the left padding IS the anchor: it decides where the focus band sits, and the
+           script derives its reference point from the first card instead of hardcoding it */
+        padding: 0 clamp(20px, 4vw, 72px);
         width: max-content;
         will-change: transform;
     }
@@ -1493,7 +1500,7 @@ El sistema para que tu negocio">
         position: relative;
         flex-shrink: 0;
         margin: 0;
-        width: calc(var(--hpg-h) * 4 / 3);
+        width: var(--hpg-card-w);
         max-width: 88vw;
         height: var(--hpg-h);
         overflow: hidden;
@@ -2259,7 +2266,7 @@ function init(section) {
     const reduceMotion = document.documentElement.classList.contains('reduced-motion') ||
         window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    let vw = 0, vh = 0, limit = 0, headH = 0, active = -1;
+    let vw = 0, vh = 0, limit = 0, headH = 0, active = -1, focusX = 0;
     const scroll = { current: 0, target: 0 };
 
     function measure() {
@@ -2283,7 +2290,15 @@ function init(section) {
             m.material.uniforms.uResolution.value.set(m.w, m.h);
         });
 
-        limit = Math.max(0, track.scrollWidth - vw);
+        /* The focus point is wherever the first card sits at rest — i.e. the track's left
+           padding plus half a card — so the CSS keeps owning the composition. Travel is then
+           the distance between the first and the last card's centre, which makes every stage
+           arrive at exactly the same x instead of the last one stopping short against the
+           right edge. That identical arrival is what keeps the parallax from lurching
+           between steps. */
+        const first = medias[0], lastM = medias[medias.length - 1];
+        focusX = first ? first.left + first.w / 2 : vw / 2;
+        limit = lastM ? Math.max(0, (lastM.left + lastM.w / 2) - focusX) : 0;
         // one pixel of page scroll == one pixel of horizontal travel
         section.style.height = '';
         headH = head.offsetHeight;
@@ -2308,9 +2323,11 @@ function init(section) {
         let nearest = 0, best = Infinity;
         medias.forEach((m, i) => {
             const center = m.left - scroll.current + m.w / 2;
+            // the mesh still maps css x onto a camera centred on the viewport; only the
+            // reference the distortion and the active pick are measured from moved left
             m.mesh.position.set(center - vw / 2, -m.top + vh / 2 - m.h / 2, 0);
-            m.material.uniforms.uParallax.value = ((center - vw / 2) / vw) * PARALLAX_INTENSITY;
-            const d = Math.abs(center - vw / 2);
+            m.material.uniforms.uParallax.value = ((center - focusX) / vw) * PARALLAX_INTENSITY;
+            const d = Math.abs(center - focusX);
             if (d < best) { best = d; nearest = i; }
         });
 
