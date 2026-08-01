@@ -1421,13 +1421,15 @@ El sistema para que tu negocio">
         z-index: 2;
         /* sized to the copy, not to the viewport: at 88vh the headline floated in a big
            empty black box. The confetti spray supplies the rest of the visual mass. */
-        min-height: min(62vh, 620px);
+        min-height: min(46vh, 470px);
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
         text-align: center;
-        padding: clamp(88px, 13vh, 170px) clamp(1.25rem, 4vw, 3rem) clamp(48px, 7vh, 96px);
+        /* bottom padding pulled right in: the headline and the gallery are one unit, and the
+           confetti already fills whatever air is left */
+        padding: clamp(72px, 10vh, 140px) clamp(1.25rem, 4vw, 3rem) clamp(12px, 1.6vh, 24px);
     }
 
     .hpg__title {
@@ -1488,11 +1490,10 @@ El sistema para que tu negocio">
         position: relative;
         z-index: 2;
         display: flex;
-        /* Sized so the next card always peeks by about a fifth of itself: that is
-           100 - 4(padding) - 66(card) - 12(the peek) in vw. It has to shrink when the card
-           grows, otherwise the neighbour falls off the right edge and the strip stops
-           reading as continuous. The gutter is not empty — the confetti lives there. */
-        gap: clamp(60px, 18vw, 340px);
+        /* Zero: the cards butt against each other and the strip reads as one continuous
+           film rather than separate panels. Side effect worth knowing — with no gutter the
+           neighbour now shows ~45% of itself instead of 17%, so the strip is busier. */
+        gap: 0;
         /* the left padding IS the anchor: it decides where the focus band sits, and the
            script derives its reference point from the first card instead of hardcoding it */
         padding: 0 clamp(20px, 4vw, 72px);
