@@ -2176,10 +2176,15 @@ const UV_SCALE = 1.0;
 const SHADER_MULTIPLIER = 2.0;
 const EASE = 0.07;
 /* Page-scroll pixels spent per pixel of horizontal travel (see measure). The wide gutter
-   between cards nearly doubled the travel, so 0.6 barely dented the section height; 0.45
-   puts a card step at roughly half a viewport of scrolling. The section can never go below
-   head + one pinned viewport, which is the 1.6 screens underneath all of this. */
-const SCROLL_RATIO = 0.45;
+   between cards nearly doubled the travel, so 0.6 barely dented the section height; the
+   section can never go below head + one pinned viewport, which is the 1.6 screens
+   underneath all of this. */
+const SCROLL_RATIO = 0.55;
+/* Share of each card's scroll segment spent parked at the focus point before the gallery
+   releases and glides to the next one. 0 = the old continuous drift, .5 = half the scroll
+   is dwell. These two are the feel knobs: HOLD decides how long you sit with a stage,
+   SCROLL_RATIO how fast the glide between them is. */
+const HOLD = 0.5;
 
 const section = document.querySelector('.hpg');
 if (section) init(section);
@@ -2290,9 +2295,26 @@ function init(section) {
         return { el, mesh, material, w: 1, h: 1, left: 0, top: 0 };
     });
 
-    const videos = imgs.filter((el) => el.tagName === 'VIDEO');
     const reduceMotion = document.documentElement.classList.contains('reduced-motion') ||
         window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    /* Only the parked stage plays. Two decoders running behind a section nobody is looking at
+       is a battery bill for nothing, and browsers do not reliably suspend offscreen video on
+       their own. Under reduced-motion none of them start — preload="auto" still leaves a
+       first frame in the texture, so the card reads as a poster instead of going black. */
+    function syncVideos(restart) {
+        cards.forEach((c, i) => {
+            const v = c.querySelector('video.js-hpg-img');
+            if (!v) return;
+            if (inView && !reduceMotion && i === active) {
+                if (restart) { try { v.currentTime = 0; } catch (e) { /* not seekable yet */ } }
+                const pr = v.play();
+                if (pr && pr.catch) pr.catch(() => {});
+            } else {
+                v.pause();
+            }
+        });
+    }
 
     let vw = 0, vh = 0, limit = 0, headH = 0, active = -1, focusX = 0;
     const scroll = { current: 0, target: 0 };
@@ -2339,13 +2361,33 @@ function init(section) {
         section.style.height = (section.offsetHeight + limit * SCROLL_RATIO) + 'px';
     }
 
+    /* Scroll is cut into one segment per card. Inside a segment the first HOLD of it returns
+       the same position — the card is parked at the focus point and its animation plays
+       against a still frame — and the rest eases across to the next card. The final segment
+       has nothing left to move to, so it is pure dwell: the last stage sits there until the
+       pin lets go. That parked-then-released cadence is the whole point; a linear map made
+       every card drift continuously and none of them ever felt arrived. */
+    function easeInOutCubic(t) {
+        return t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    }
+
+    function stepped(p) {
+        const n = medias.length;
+        if (n < 2) return 0;
+        const t = p * n;
+        const i = Math.min(Math.floor(t), n - 1);
+        const local = t - i;
+        const k = local < HOLD ? 0 : easeInOutCubic((local - HOLD) / (1 - HOLD));
+        return Math.min(i + k, n - 1) / (n - 1);
+    }
+
     function onScroll() {
         // travel is measured from the moment the pin sticks (i.e. once the head is past),
         // not from the top of the section — otherwise the head eats part of the gallery
         const rect = section.getBoundingClientRect();
         const span = section.offsetHeight - headH - window.innerHeight;
         const p = span > 0 ? clamp(0, 1, (-rect.top - headH) / span) : 0;
-        scroll.target = p * limit;
+        scroll.target = stepped(p) * limit;
     }
 
     function render() {
@@ -2368,6 +2410,9 @@ function init(section) {
         if (nearest !== active) {
             active = nearest;
             cards.forEach((c, i) => c.classList.toggle('is-active', i === nearest));
+            /* Rewind on arrival: the stage that just parked plays its animation from frame 0
+               against a still card, instead of being caught somewhere mid-loop. */
+            syncVideos(true);
             if (count) count.textContent = String(nearest + 1).padStart(2, '0') + ' / ' + String(cards.length).padStart(2, '0');
         }
         if (limit > 0) {
@@ -2393,14 +2438,7 @@ function init(section) {
     let inView = false, rafOn = false;
     new IntersectionObserver((es) => {
         inView = es[0].isIntersecting;
-        /* Two decoders running behind a section nobody is looking at is a battery bill for
-           nothing; browsers do not reliably suspend offscreen video on their own. Under
-           reduced-motion they never start — preload="auto" still leaves a first frame in the
-           texture, so the card reads as a poster instead of going black. */
-        videos.forEach((v) => {
-            if (inView && !reduceMotion) { const p = v.play(); if (p && p.catch) p.catch(() => {}); }
-            else v.pause();
-        });
+        syncVideos(false);
         if (inView && !rafOn) {
             // no easing back from wherever the loop was parked — enter already in position
             onScroll();
