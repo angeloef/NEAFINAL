@@ -1,0 +1,146 @@
+{
+  "$ref": "#/definitions/copy",
+  "definitions": {
+    "copy": {
+      "type": "object",
+      "properties": {
+        "mission_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "hero": {
+          "type": "object",
+          "properties": {
+            "titulo": {
+              "type": "string",
+              "minLength": 1
+            },
+            "subtitulo": {
+              "type": "string"
+            },
+            "cta_texto": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "titulo",
+            "cta_texto"
+          ],
+          "additionalProperties": false
+        },
+        "areas_practica": {
+          "type": "object",
+          "properties": {
+            "titulo": {
+              "type": "string",
+              "minLength": 1
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 1
+            }
+          },
+          "required": [
+            "titulo",
+            "items"
+          ],
+          "additionalProperties": false
+        },
+        "prueba_social": {
+          "type": "object",
+          "properties": {
+            "titulo": {
+              "type": "string",
+              "minLength": 1
+            },
+            "resenas": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "autor": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "texto": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "rating": {
+                    "type": "number",
+                    "minimum": 1,
+                    "maximum": 5
+                  }
+                },
+                "required": [
+                  "autor",
+                  "texto"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1
+            }
+          },
+          "required": [
+            "titulo",
+            "resenas"
+          ],
+          "additionalProperties": false
+        },
+        "contacto": {
+          "type": "object",
+          "properties": {
+            "titulo": {
+              "type": "string",
+              "minLength": 1
+            },
+            "telefono": {
+              "type": "string"
+            },
+            "whatsapp": {
+              "type": "string"
+            },
+            "email": {
+              "type": "string",
+              "format": "email"
+            }
+          },
+          "required": [
+            "titulo"
+          ],
+          "additionalProperties": false
+        },
+        "meta": {
+          "type": "object",
+          "properties": {
+            "title": {
+              "type": "string",
+              "minLength": 1
+            },
+            "description": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "title",
+            "description"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "mission_id",
+        "hero",
+        "contacto"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

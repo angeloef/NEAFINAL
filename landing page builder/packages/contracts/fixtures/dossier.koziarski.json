@@ -1,0 +1,14 @@
+{
+  "mission_id": "koziarski_obera",
+  "entidad": {
+    "nombre": { "valor": "Estudio Jurídico Dr. Dardo Koziarski", "clase": "VERIFICADO-OBLIG", "source": "google_places", "confidence": 0.96, "fecha": "2026-06-23" }
+  },
+  "ubicacion": {
+    "ciudad": { "valor": "Oberá", "clase": "VERIFICADO-OBLIG", "source": "google_places", "confidence": 0.95, "fecha": "2026-06-23" }
+  },
+  "contacto": {
+    "telefono": { "valor": "+5493755111111", "clase": "VERIFICADO-OBLIG", "source": "fixture-sintetico", "confidence": 0.7, "fecha": "2026-06-23" }
+  },
+  "place_id": { "valor": "cid:9659205943439986436", "clase": "VERIFICADO-OBLIG", "source": "google_maps_cid", "confidence": 0.99, "fecha": "2026-06-23" },
+  "estado_web": "sin_web"
+}

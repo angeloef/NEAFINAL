@@ -1,0 +1,72 @@
+{
+  "$ref": "#/definitions/validation_contract",
+  "definitions": {
+    "validation_contract": {
+      "type": "object",
+      "properties": {
+        "contract_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "aplica_a": {
+          "type": "string",
+          "minLength": 1
+        },
+        "regla_cobertura": {
+          "type": "string",
+          "minLength": 1
+        },
+        "assertions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "categoria": {
+                "type": "string",
+                "minLength": 1
+              },
+              "texto": {
+                "type": "string",
+                "minLength": 1
+              },
+              "feature": {
+                "type": "string",
+                "minLength": 1
+              },
+              "severidad": {
+                "type": "string",
+                "enum": [
+                  "bloqueante",
+                  "alta",
+                  "media",
+                  "baja"
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "categoria",
+              "texto",
+              "feature",
+              "severidad"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "contract_id",
+        "aplica_a",
+        "regla_cobertura",
+        "assertions"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

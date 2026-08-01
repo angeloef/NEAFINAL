@@ -1,0 +1,42 @@
+# Frop — Personal Coding Harness
+# Phase 1 & 2 Dependencies
+#
+# Install with: pip install -r requirements.txt
+
+# Core LangGraph
+langgraph>=0.3.0
+langchain-core
+
+# LLM Integration (OpenAI-compatible for DeepSeek)
+langchain-openai
+
+# Data Validation
+pydantic>=2.0
+
+# CLI / Interactive Terminal
+rich
+
+# Docker Sandbox
+docker-py
+
+# Configuration
+pyyaml
+python-dotenv
+
+# Testing
+pytest
+pytest-asyncio
+
+# ── Phase 2: Persistence & Memory ──────────────────────────────────
+
+# PostgreSQL async client — core store
+asyncpg
+
+# PostgreSQL sync driver — fallback / LangGraph checkpointer
+psycopg2-binary
+
+# Vector store for skill matching / RAG
+chromadb
+
+# Embeddings for skill matching
+sentence-transformers

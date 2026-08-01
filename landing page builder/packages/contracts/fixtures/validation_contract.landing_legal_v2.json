@@ -1,0 +1,18 @@
+{
+  "contract_id": "landing_legal_v2",
+  "aplica_a": "estudios_juridicos",
+  "regla_cobertura": "cada feature cubre >=1 assertion; la union de features cubre el 100% de assertions bloqueantes",
+  "assertions": [
+    { "id": "ID-01", "categoria": "identidad", "texto": "El hero muestra el nombre exacto del estudio (dossier.entidad.nombre)", "feature": "hero", "severidad": "bloqueante" },
+    { "id": "ID-02", "categoria": "identidad", "texto": "La ciudad/zona mostrada coincide con dossier.ubicacion.ciudad", "feature": "hero|contacto", "severidad": "bloqueante" },
+    { "id": "AC-01", "categoria": "veracidad", "texto": "Todo dato factico renderizado mapea a un campo dossier de clase VERIFICADO", "feature": "*", "severidad": "bloqueante" },
+    { "id": "AC-02", "categoria": "veracidad", "texto": "No hay testimonios salvo resenas reales presentes en dossier.prueba_social", "feature": "prueba_social", "severidad": "bloqueante" },
+    { "id": "LG-01", "categoria": "legal", "texto": "No hay claims de resultados garantizados ni superioridad comparativa", "feature": "*", "severidad": "bloqueante" },
+    { "id": "BR-01", "categoria": "marca", "texto": "Sin logo real se usa monograma; nunca un logo inventado presentado como propio", "feature": "hero", "severidad": "bloqueante" },
+    { "id": "CTA-01", "categoria": "funcional", "texto": "El boton WhatsApp abre wa.me con el numero real del dossier", "feature": "hero|contacto", "severidad": "bloqueante" },
+    { "id": "UX-01", "categoria": "render", "texto": "La pagina renderiza sin errores de consola en mobile y desktop", "feature": "*", "severidad": "bloqueante" },
+    { "id": "UX-02", "categoria": "a11y", "texto": "Contraste texto/fondo cumple WCAG AA", "feature": "*", "severidad": "alta" },
+    { "id": "CP-01", "categoria": "completitud", "texto": "Las secciones opcionales aparecen solo si su dato existe; su ausencia degrada sin romper", "feature": "*", "severidad": "alta" },
+    { "id": "PR-01", "categoria": "presentable", "texto": "El screenshot final luce pulido y coherente (revision UI/UX aprobada)", "feature": "secciones_y_ensamblado", "severidad": "alta" }
+  ]
+}

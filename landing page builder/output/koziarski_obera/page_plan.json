@@ -1,0 +1,19 @@
+{
+  "mission_id": "koziarski_obera",
+  "meta": {
+    "title": "Estudio Jurídico Dr. Dardo Koziarski — Abogado en Oberá, Misiones",
+    "description": "Asesoramiento jurídico integral en Oberá, Misiones. Atención personalizada en derecho civil, laboral y de familia."
+  },
+  "blocks": [
+    { "type": "hero", "variant": "image_overlay", "data": { "titulo": { "valor": "Estudio Jurídico Dr. Dardo Koziarski", "clase": "VERIFICADO-OBLIG" }, "subtitulo": "Asesoramiento jurídico integral en Oberá, Misiones.", "cta_texto": "Solicitar una consulta" } },
+    { "type": "trust_bar", "variant": "chips", "data": { "items": [ { "valor": "Derecho Civil", "clase": "PLANTILLA" }, { "valor": "Derecho Laboral", "clase": "PLANTILLA" }, { "valor": "Derecho de Familia", "clase": "PLANTILLA" }, { "valor": "Atención en Oberá", "clase": "VERIFICADO-OPC" } ] } },
+    { "type": "areas", "variant": "cards", "data": { "titulo": "Áreas de Práctica", "items": [ { "valor": "Derecho Civil", "clase": "PLANTILLA" }, { "valor": "Derecho Laboral", "clase": "PLANTILLA" }, { "valor": "Derecho de Familia", "clase": "PLANTILLA" }, { "valor": "Sucesiones", "clase": "PLANTILLA" } ] } },
+    { "type": "about", "variant": "dark_band", "data": { "titulo": "Sobre el Estudio", "texto": { "valor": "Un estudio jurídico comprometido con la defensa de los derechos de sus clientes, con atención cercana y personalizada en Oberá.", "clase": "PLANTILLA" } } },
+    { "type": "process", "variant": "steps", "data": { "titulo": "Cómo trabajamos", "pasos": [ { "titulo": "Consulta inicial", "descripcion": "Escuchamos su caso y evaluamos las opciones disponibles." }, { "titulo": "Estrategia", "descripcion": "Definimos un plan de acción claro y a su medida." }, { "titulo": "Seguimiento", "descripcion": "Acompañamos cada etapa del proceso con comunicación constante." } ] } },
+    { "type": "results", "variant": "band", "data": { "titulo": "Nuestro enfoque", "items": [ { "valor": "Atención personalizada", "clase": "PLANTILLA" }, { "valor": "Comunicación clara", "clase": "PLANTILLA" }, { "valor": "Compromiso con cada caso", "clase": "PLANTILLA" } ] } },
+    { "type": "faq", "variant": "accordion", "data": { "titulo": "Preguntas Frecuentes", "items": [ { "pregunta": "¿Cómo solicito una consulta?", "respuesta": "Puede comunicarse por teléfono o WhatsApp para coordinar una primera entrevista." }, { "pregunta": "¿Qué áreas atienden?", "respuesta": "Asesoramos en derecho civil, laboral, de familia y sucesiones, entre otras." } ] } },
+    { "type": "cta_band", "variant": "band", "data": { "titulo": "¿Necesita asesoramiento legal?", "cta_texto": "Contáctenos hoy" } },
+    { "type": "contact", "variant": "channels", "data": { "titulo": "Contacto" } },
+    { "type": "footer", "variant": "nap", "data": { "nombre": { "valor": "Estudio Jurídico Dr. Dardo Koziarski", "clase": "VERIFICADO-OBLIG" }, "direccion": { "valor": "Oberá, Misiones", "clase": "VERIFICADO-OPC" }, "disclaimer": "La información de este sitio tiene carácter general y no constituye asesoramiento legal específico." } }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "neasistemas-home",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "8080", "--directory", "neasistemas_v2/neasistemas_home"],
+      "port": 8080
+    }
+  ]
+}

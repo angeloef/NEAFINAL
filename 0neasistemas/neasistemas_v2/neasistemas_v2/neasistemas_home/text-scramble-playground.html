@@ -1,0 +1,396 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Text Scramble Playground — sección "Negocios donde la imagen decide la venta"</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" id="tinu-homepage-css" href="assets/homepage.min.e9366b4f.css" media="all">
+<style>
+    /* ---- control panel (not part of the real site, playground-only) ---- */
+    .fx-panel{position:fixed;top:0;right:0;width:300px;height:100vh;overflow-y:auto;
+        background:#fafafa;border-left:1px solid #e6e6e6;z-index:99999;
+        padding:22px 20px 60px;font-family:Inter,system-ui,sans-serif;color:#111;box-sizing:border-box;}
+    .fx-panel *{box-sizing:border-box;}
+    .fx-panel h1{font-size:.95rem;margin:0 0 4px;}
+    .fx-panel .sub{font-size:.75rem;color:#8a8a8a;margin:0 0 20px;line-height:1.4;}
+    .fx-group-title{font-size:.7rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#9a9a9a;margin:20px 0 12px;}
+    .fx-group-title:first-of-type{margin-top:0;}
+    .fx-field{margin-bottom:14px;}
+    .fx-field label{display:block;font-size:.82rem;font-weight:600;margin-bottom:6px;}
+    .fx-slider-row{display:flex;align-items:center;gap:12px;}
+    .fx-slider-row input[type=range]{flex:1;accent-color:#111;}
+    .fx-slider-row .fx-val{font-size:.8rem;color:#8a8a8a;font-variant-numeric:tabular-nums;min-width:34px;text-align:right;}
+    .fx-btn{width:100%;border:none;background:#111;color:#fff;padding:11px 16px;border-radius:100px;
+        font-weight:600;cursor:pointer;font-size:.85rem;margin-top:6px;}
+    .fx-btn:hover{opacity:.85;}
+    .fx-btn:disabled{opacity:.5;cursor:default;}
+    .fx-hint{font-size:.72rem;color:#8a8a8a;margin-top:6px;line-height:1.4;}
+    /* keep page content clear of the fixed panel */
+    body{margin-right:300px;}
+</style>
+</head>
+<body class="home wp-singular page-template page-template-template-homepage page-template-template-homepage-php page page-id-16542 wp-theme-tiendanube-insti homepage-redesign navbar-fixed-padding elementor-default elementor-kit-5 elementor-page elementor-page-16542">
+
+<div style="height:60vh;display:flex;align-items:center;justify-content:center;color:#8a8a8a;font-family:Inter,system-ui,sans-serif;font-size:.9rem;text-align:center;padding:0 2rem;">
+    Scroll ↓ para entrar a la sección real, o usá "Replay" en el panel.
+</div>
+
+<section class="js-hp-brands wg-hp wg-hp-brands wg-hp-imagetrail position-relative overflow-hidden" aria-labelledby="wg-hp-brands-title">
+    <div class="wg-hp-brands-floating-images position-absolute" aria-hidden="true">
+        <div class="js-hp-brands-card js-hp-brands-video-target wg-hp-brands-video-wrapper overflow-hidden" aria-hidden="true">
+            <div class="wg-hp-hero-video is-ready overflow-hidden">
+                <div class="wg-hp-hero-video-inner position-relative w-100 h-100 overflow-hidden">
+                    <video class="wg-hp-hero-video-element d-block" playsinline poster="assets/hero-ar-poster.f77b8342.webp" autoplay loop muted>
+                        <source src="assets/hero-ar.mp4" type="video/mp4">
+                    </video>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="js-hp-imagetrail-stage wg-hp-imagetrail-stage" aria-hidden="true">
+        <img class="wg-hp-imagetrail-img" src="assets/imagetrail/1.jpg" alt="" loading="lazy" decoding="async">
+        <img class="wg-hp-imagetrail-img" src="assets/imagetrail/2.jpg" alt="" loading="lazy" decoding="async">
+        <img class="wg-hp-imagetrail-img" src="assets/imagetrail/3.jpg" alt="" loading="lazy" decoding="async">
+        <img class="wg-hp-imagetrail-img" src="assets/imagetrail/4.jpg" alt="" loading="lazy" decoding="async">
+        <img class="wg-hp-imagetrail-img" src="assets/imagetrail/5.jpg" alt="" loading="lazy" decoding="async">
+        <img class="wg-hp-imagetrail-img" src="assets/imagetrail/6.jpg" alt="" loading="lazy" decoding="async">
+        <img class="wg-hp-imagetrail-img" src="assets/imagetrail/7.jpg" alt="" loading="lazy" decoding="async">
+        <img class="wg-hp-imagetrail-img" src="assets/imagetrail/8.jpg" alt="" loading="lazy" decoding="async">
+        <img class="wg-hp-imagetrail-img" src="assets/imagetrail/9.jpg" alt="" loading="lazy" decoding="async">
+        <img class="wg-hp-imagetrail-img" src="assets/imagetrail/10.jpg" alt="" loading="lazy" decoding="async">
+        <img class="wg-hp-imagetrail-img" src="assets/imagetrail/11.jpg" alt="" loading="lazy" decoding="async">
+        <img class="wg-hp-imagetrail-img" src="assets/imagetrail/12.jpg" alt="" loading="lazy" decoding="async">
+        <img class="wg-hp-imagetrail-img" src="assets/imagetrail/13.jpg" alt="" loading="lazy" decoding="async">
+        <img class="wg-hp-imagetrail-img" src="assets/imagetrail/14.jpg" alt="" loading="lazy" decoding="async">
+        <img class="wg-hp-imagetrail-img" src="assets/imagetrail/15.jpg" alt="" loading="lazy" decoding="async">
+    </div>
+
+    <div class="js-hp-brands-center wg-hp-brands-center wg-hp-imagetrail-center">
+        <h2 id="wg-hp-brands-title" class="js-hp-brands-title wg-hp-brands-title wg-hp-imagetrail-title">
+            <span>Negocios</span> donde la imagen <br class="d-none d-sm-block"> decide la venta
+        </h2>
+    </div>
+
+    <div class="wg-hp-imagetrail-hint d-md-none">Mové el dedo por la pantalla</div>
+
+    <style>
+        .wg-hp-imagetrail{
+            --it-bg:#EFECE7;--it-ink:#000000;--it-amber:#FFB400;--it-orange:#F63E02;--it-blue:#246EB9;
+            --it-stage-h:min(96vh,940px);
+            /* wider + closer than production: bigger anchor, less dead air under the title */
+            --it-card-w:clamp(360px,38vw,600px);
+            --it-card-h:calc(var(--it-card-w) / 1.6);
+            --it-card-gap:clamp(1rem,2.5vh,2rem);
+            background-color:var(--it-bg)!important;padding:0!important;margin:0!important;transform:none!important;
+            min-height:var(--it-stage-h);isolation:isolate;touch-action:pan-y;
+        }
+        .wg-hp-imagetrail-stage{position:absolute;inset:0;z-index:2;pointer-events:none;
+            /* grounds the trail toward the headline instead of letting images float
+               untethered to the far edges of an otherwise-empty canvas */
+            -webkit-mask-image:radial-gradient(ellipse 65% 65% at 50% 42%,#000 55%,transparent 100%);
+            mask-image:radial-gradient(ellipse 65% 65% at 50% 42%,#000 55%,transparent 100%);}
+        .wg-hp-imagetrail-img{width:230px;max-width:32vw;aspect-ratio:3/4;object-fit:cover;position:absolute;top:0;left:0;opacity:0;will-change:transform,opacity;border-radius:6px;box-shadow:0 12px 30px rgba(0,0,0,.18);outline:1px solid rgba(0,0,0,.1);outline-offset:-1px;}
+
+        .wg-hp-imagetrail-center{position:relative;z-index:5;height:var(--it-stage-h);display:flex;align-items:center;justify-content:center;pointer-events:none;padding:0 clamp(1.25rem,4vw,3rem)!important;padding-bottom:calc(var(--it-card-h) + var(--it-card-gap))!important;}
+        .wg-hp-imagetrail-title{margin:0;text-align:center;max-width:min(94vw,1180px);font-size:clamp(2.5rem,6vw,5.75rem);line-height:1.02;letter-spacing:-.025em;text-wrap:balance;color:var(--it-ink);transition-property:color;transition-duration:.45s;transition-timing-function:ease;}
+        .wg-hp-imagetrail-title span:not(.it-w):not(.it-c){display:inline;font-size:inherit;color:var(--it-blue);transition-property:color;transition-duration:.45s;transition-timing-function:ease;}
+        .wg-hp-imagetrail.is-near .wg-hp-imagetrail-title{color:var(--it-orange);}
+        .wg-hp-imagetrail.is-near .wg-hp-imagetrail-title span:not(.it-w):not(.it-c){color:var(--it-amber);}
+
+        /* per-char split (built at runtime). hover-scale lives on the WORD span; the char
+           spans are driven by a scroll-scrubbed glyph-scramble instead of a CSS transform. */
+        .wg-hp-imagetrail-title .it-w{display:inline-block;white-space:nowrap;transition-property:transform;transition-duration:.5s;transition-timing-function:cubic-bezier(.2,.8,.2,1);}
+        .wg-hp-imagetrail-title .it-c{display:inline-block;will-change:opacity,filter;}
+        .wg-hp-imagetrail-title.is-split .it-c{opacity:0;}
+        .wg-hp-imagetrail.is-near .wg-hp-imagetrail-title .it-w{transform:scale(1.04);}
+
+        /* Once every letter has resolved, the WHOLE line breathes as one unit —
+           a per-letter bob broke the baseline (letters drifting out of line);
+           moving together keeps typography intact while still feeling alive. */
+        @keyframes it-breathe{0%,100%{transform:translateY(0);}50%{transform:translateY(-3px);}}
+        .wg-hp-imagetrail-title.is-settled{animation:it-breathe 4s ease-in-out infinite;}
+
+        .wg-hp-imagetrail-hint{position:absolute;left:0;right:0;bottom:1rem;z-index:6;text-align:center;font-size:.8rem;color:var(--it-ink);opacity:.55;pointer-events:none;}
+        @media (min-width:768px){.wg-hp-imagetrail-hint{display:none;}}
+
+        @media (min-width:768px){
+            .wg-hp-imagetrail .wg-hp-brands-video-wrapper{position:absolute;top:auto;left:0;right:0;bottom:var(--it-card-gap);margin:0 auto;width:var(--it-card-w);height:var(--it-card-h);border-radius:24px;background-color:var(--it-ink);box-shadow:0 28px 64px -16px rgba(0,0,0,.32),0 6px 16px -4px rgba(0,0,0,.14);}
+            .wg-hp-imagetrail .wg-hp-brands-video-wrapper .wg-hp-hero-video,
+            .wg-hp-imagetrail .wg-hp-brands-video-wrapper .wg-hp-hero-video-inner,
+            .wg-hp-imagetrail .wg-hp-brands-video-wrapper video{border-radius:24px!important;}
+        }
+        @media (max-width:767px){
+            .wg-hp-imagetrail{padding:60px 0!important;min-height:520px;}
+            .wg-hp-imagetrail-center{height:auto;min-height:400px;padding-bottom:0!important;}
+            .wg-hp-imagetrail-img{width:150px;max-width:44vw;}
+        }
+        @media (prefers-reduced-motion:reduce){
+            .wg-hp-imagetrail-title .it-c{transition:none;animation:none;}
+            .wg-hp-imagetrail-title.is-settled{animation:none;}
+        }
+    </style>
+</section>
+
+<div style="height:70vh;"></div>
+
+<aside class="fx-panel">
+    <h1>Text Scramble — ajustes</h1>
+    <p class="sub">Sección real (imágenes, video, título). Scrolleá para resolver el título, o usá Replay. Los sliders controlan el efecto de scramble por letra.</p>
+
+    <div class="fx-group-title">Style</div>
+    <div class="fx-field">
+        <label for="cycles">Scramble Cycles</label>
+        <div class="fx-slider-row">
+            <input id="cycles" type="range" min="1" max="20" step="1" value="8">
+            <span class="fx-val" id="cycles-val">8</span>
+        </div>
+    </div>
+    <div class="fx-field">
+        <label for="stagger">Letter Stagger (frames)</label>
+        <div class="fx-slider-row">
+            <input id="stagger" type="range" min="0" max="20" step="1" value="6">
+            <span class="fx-val" id="stagger-val">6</span>
+        </div>
+    </div>
+    <div class="fx-field">
+        <label for="cyclespeed">Cycle Speed (frames)</label>
+        <div class="fx-slider-row">
+            <input id="cyclespeed" type="range" min="1" max="10" step="1" value="3">
+            <span class="fx-val" id="cyclespeed-val">3</span>
+        </div>
+    </div>
+    <div class="fx-field">
+        <label for="speed">Animation Speed</label>
+        <div class="fx-slider-row">
+            <input id="speed" type="range" min="0.25" max="3" step="0.05" value="1">
+            <span class="fx-val" id="speed-val">1.0</span>
+        </div>
+    </div>
+
+    <div class="fx-group-title">Duration</div>
+    <div class="fx-field">
+        <label for="duration">Replay duration</label>
+        <div class="fx-slider-row">
+            <input id="duration" type="range" min="0.5" max="6" step="0.1" value="2">
+            <span class="fx-val" id="duration-val">2.0s</span>
+        </div>
+        <div class="fx-hint">How long the "Replay" scroll-through takes. Only affects the button — real scrolling always drives the effect directly.</div>
+    </div>
+
+    <button class="fx-btn" id="replayBtn" type="button">▶ Replay</button>
+</aside>
+
+<script>
+(function(){
+    var root=document.querySelector('.wg-hp-imagetrail');
+    var imgs=[].slice.call(root.querySelectorAll('.wg-hp-imagetrail-img'));
+    var title=root.querySelector('.wg-hp-imagetrail-title');
+    var reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    /* ---- per-char split, unchanged from the production section ---- */
+    function splitChars(el){
+        var chars=[];
+        (function walk(node){
+            [].slice.call(node.childNodes).forEach(function(n){
+                if(n.nodeType===3){
+                    var frag=document.createDocumentFragment();
+                    n.nodeValue.split(/(\s+)/).forEach(function(tok){
+                        if(!tok) return;
+                        if(/^\s+$/.test(tok)){frag.appendChild(document.createTextNode(' '));return;}
+                        var w=document.createElement('span');
+                        w.className='it-w';
+                        tok.split('').forEach(function(ch){
+                            var c=document.createElement('span');
+                            c.className='it-c';
+                            c.textContent=ch;
+                            w.appendChild(c);
+                            chars.push(c);
+                        });
+                        frag.appendChild(w);
+                    });
+                    node.replaceChild(frag,n);
+                } else if(n.nodeType===1 && n.tagName!=='BR'){
+                    walk(n);
+                }
+            });
+        })(el);
+        return chars;
+    }
+
+    /* ---- glyph-scramble reveal (swishy-style stagger/cycles/cycle-speed),
+           driven positionally by scroll progress so it stays reversible. ---- */
+    var GLYPH_UPPER='ABCDEFGHIJKLMNOPQRSTUVWXYZ',GLYPH_LOWER='abcdefghijklmnopqrstuvwxyz';
+    function randomGlyph(ch){
+        if(/[A-ZÀ-Ö]/.test(ch)) return GLYPH_UPPER[Math.random()*GLYPH_UPPER.length|0];
+        if(/[a-zø-ÿ]/.test(ch)) return GLYPH_LOWER[Math.random()*GLYPH_LOWER.length|0];
+        return ch;
+    }
+
+    var chars=[];
+    if(title && !reduce){
+        title.setAttribute('aria-label',title.textContent.replace(/\s+/g,' ').trim());
+        var spans=splitChars(title);
+        if(spans.length){
+            title.classList.add('is-split');
+            chars=spans.map(function(c){ c._lastCycle=-1; return {el:c,ch:c.textContent}; });
+        }
+    }
+
+    var params={cycles:8,stagger:6,cyclespeed:3,speed:1,duration:2};
+
+    function totalFrames(){
+        var n=chars.length;
+        return Math.max(1,(n-1)*params.stagger+params.cycles*params.cyclespeed);
+    }
+
+    function render(frame){
+        var n=chars.length;
+        for(var i=0;i<n;i++){
+            var d=chars[i],el=d.el,ch=d.ch;
+            var start=i*params.stagger,resolve=start+params.cycles*params.cyclespeed;
+            var localPc=(frame-start)/Math.max(1,resolve-start);
+            localPc=localPc<0?0:localPc>1?1:localPc;
+            if(frame<start){
+                el.style.opacity=0;
+                el.style.filter='';
+            } else if(frame<resolve){
+                var cyclesDone=Math.floor((frame-start)/params.cyclespeed);
+                if(el._lastCycle!==cyclesDone){
+                    el.textContent=randomGlyph(ch);
+                    el._lastCycle=cyclesDone;
+                }
+                el.style.opacity=(0.3+localPc*0.7).toFixed(2);
+                el.style.filter='blur('+((1-localPc)*1.5).toFixed(2)+'px)';
+            } else {
+                if(el.textContent!==ch) el.textContent=ch;
+                el.style.opacity=1;
+                el.style.filter='';
+                el._lastCycle=-1;
+            }
+        }
+    }
+
+    /* progress 0->1 as the section scrolls up through the viewport */
+    function textProgress(){
+        var vh=window.innerHeight||1;
+        var p=(vh-root.getBoundingClientRect().top)/(vh*0.9);
+        return p<0?0:p>1?1:p;
+    }
+
+    var scrubbed=0,settled=false;
+    function applyScrub(){
+        if(!chars.length) return;
+        var target=textProgress();
+        scrubbed+=(target-scrubbed)*.15;
+        if(Math.abs(target-scrubbed)<.0008) scrubbed=target;
+        render(scrubbed*totalFrames());
+        /* hysteresis: trigger the idle breathe once nearly fully resolved, only
+           drop it once scrolled clearly back out — avoids on/off flicker right
+           at the boundary, and doesn't require every last char to hit exactly 1. */
+        if(!settled && scrubbed>=0.985) settled=true;
+        else if(settled && scrubbed<0.9) settled=false;
+        if(title) title.classList.toggle('is-settled',settled);
+    }
+
+    /* ---- floating image trail (unchanged from production) ---- */
+    var total=imgs.length,pos=0,z=1;
+    var mouse={x:0,y:0},cache={x:0,y:0},last={x:0,y:0};
+    var threshold=100,started=false;
+
+    function dist(x1,y1,x2,y2){return Math.hypot(x2-x1,y2-y1);}
+    function lerp(a,b,n){return (1-n)*a+n*b;}
+
+    function updateNear(){
+        var r=title.getBoundingClientRect(),stage=root.getBoundingClientRect();
+        var cx=r.left-stage.left+r.width/2,cy=r.top-stage.top+r.height/2;
+        var near=dist(mouse.x,mouse.y,cx,cy)<Math.max(r.width,r.height)/2+60;
+        root.classList.toggle('is-near',near);
+    }
+
+    function showNext(){
+        var img=imgs[pos],w=img.offsetWidth,h=img.offsetHeight;
+        var sx=cache.x-w/2,sy=cache.y-h/2,ex=mouse.x-w/2,ey=mouse.y-h/2;
+        img.getAnimations().forEach(function(a){a.cancel();});
+        img.style.zIndex=z;
+        img.animate([
+            {transform:'translate('+sx+'px,'+sy+'px) scale(1)',opacity:1},
+            {transform:'translate('+ex+'px,'+ey+'px) scale(1)',opacity:1,offset:.4},
+            {transform:'translate('+ex+'px,'+ey+'px) scale(.2)',opacity:0}
+        ],{duration:900,easing:'cubic-bezier(.19,1,.22,1)',fill:'forwards'});
+    }
+
+    function trailStep(){
+        var d=dist(mouse.x,mouse.y,last.x,last.y);
+        cache.x=lerp(cache.x||mouse.x,mouse.x,.12);
+        cache.y=lerp(cache.y||mouse.y,mouse.y,.12);
+        if(d>threshold){
+            showNext();
+            z++;
+            pos=(pos+1)%total;
+            last={x:mouse.x,y:mouse.y};
+        }
+        updateNear();
+    }
+
+    var inView=true,rafOn=false;
+    function loop(){
+        applyScrub();
+        if(started&&total) trailStep();
+        if(inView){requestAnimationFrame(loop);} else {rafOn=false;}
+    }
+    new IntersectionObserver(function(es){
+        inView=es[0].isIntersecting;
+        if(inView&&!rafOn){rafOn=true;requestAnimationFrame(loop);}
+    },{rootMargin:'25% 0px'}).observe(root);
+    requestAnimationFrame(loop);
+
+    function onMove(ev){
+        var r=root.getBoundingClientRect();
+        mouse.x=ev.clientX-r.left;
+        mouse.y=ev.clientY-r.top;
+        if(!started){started=true;last={x:mouse.x,y:mouse.y};}
+    }
+    root.addEventListener('pointermove',onMove);
+    root.addEventListener('pointerleave',function(){root.classList.remove('is-near');});
+
+    /* ---- playground panel wiring ---- */
+    function bindSlider(id,key,fmt){
+        var input=document.getElementById(id),val=document.getElementById(id+'-val');
+        input.addEventListener('input',function(){
+            params[key]=parseFloat(input.value);
+            val.textContent=fmt(params[key]);
+        });
+    }
+    bindSlider('cycles','cycles',function(v){return v.toFixed(0);});
+    bindSlider('stagger','stagger',function(v){return v.toFixed(0);});
+    bindSlider('cyclespeed','cyclespeed',function(v){return v.toFixed(0);});
+    bindSlider('speed','speed',function(v){return v.toFixed(2);});
+    bindSlider('duration','duration',function(v){return v.toFixed(1)+'s';});
+
+    /* Replay = smooth-scroll the real window across the section's resolve
+       window, so the exact same scroll-driven render() plays it back —
+       no separate timed animation path to keep in sync. */
+    function easeInOutQuad(t){return t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;}
+    var replayRaf=null;
+    document.getElementById('replayBtn').addEventListener('click',function(){
+        if(replayRaf) cancelAnimationFrame(replayRaf);
+        var vh=window.innerHeight,top=root.getBoundingClientRect().top+window.scrollY;
+        var y0=top-vh,y1=top-vh*0.1;
+        var dur=Math.max(.2,params.duration/params.speed)*1000;
+        var btn=document.getElementById('replayBtn');
+        btn.disabled=true;
+        window.scrollTo(0,y0);
+        var t0=null;
+        function tick(ts){
+            if(t0===null) t0=ts;
+            var t=Math.min(1,(ts-t0)/dur);
+            window.scrollTo(0,y0+(y1-y0)*easeInOutQuad(t));
+            if(t<1){ replayRaf=requestAnimationFrame(tick); }
+            else { btn.disabled=false; }
+        }
+        replayRaf=requestAnimationFrame(tick);
+    });
+})();
+</script>
+</body>
+</html>

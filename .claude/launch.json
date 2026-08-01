@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "neafinal",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "8931", "--directory", "0neasistemas/neasistemas_v2/neasistemas_v2/neasistemas_home"],
+      "port": 8931
+    }
+  ]
+}

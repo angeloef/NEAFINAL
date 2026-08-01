@@ -1,0 +1,23 @@
+{
+  "mission_id": "flosi_obera",
+  "entidad": {
+    "nombre": { "valor": "Flosi & Asociados", "clase": "VERIFICADO-OBLIG", "source": "google_places", "confidence": 0.98, "fecha": "2026-06-23" },
+    "tipo": { "valor": "Estudio Jurídico", "clase": "VERIFICADO-OPC", "source": "google_places", "confidence": 0.95, "fecha": "2026-06-23" }
+  },
+  "ubicacion": {
+    "ciudad": { "valor": "Oberá", "clase": "VERIFICADO-OBLIG", "source": "google_places", "confidence": 0.98, "fecha": "2026-06-23" },
+    "zona": { "valor": "Misiones", "clase": "VERIFICADO-OPC", "source": "google_places", "confidence": 0.9, "fecha": "2026-06-23" },
+    "direccion": { "valor": "Rivadavia 915", "clase": "VERIFICADO-OPC", "source": "google_places", "confidence": 0.92, "fecha": "2026-06-23" }
+  },
+  "contacto": {
+    "whatsapp": { "valor": "+5493755000000", "clase": "VERIFICADO-OPC", "source": "fixture-sintetico", "confidence": 0.6, "fecha": "2026-06-23" }
+  },
+  "place_id": { "valor": "estudioflosi.com.ar", "clase": "VERIFICADO-OBLIG", "source": "sitio_propio", "confidence": 0.97, "fecha": "2026-06-23" },
+  "areas_practica": { "valor": ["Civil", "Laboral", "Familia"], "clase": "VERIFICADO-OPC", "source": "sitio_propio", "confidence": 0.85, "fecha": "2026-06-23" },
+  "prueba_social": {
+    "resenas": [
+      { "autor": "Cliente verificado", "texto": "+40 años de trayectoria, atención excelente.", "rating": 5, "fecha": "2026-05-10" }
+    ]
+  },
+  "estado_web": "web_propia"
+}
