@@ -1636,8 +1636,13 @@ El sistema para que tu negocio">
             <div class="js-hpg-track hpg__track">
 
                 <article class="js-hpg-card hpg__card" aria-label="Paso 1: Analizamos tu negocio">
-                    <!-- TODO: reemplazar por el asset final de la etapa 1 -->
-                    <img class="js-hpg-img hpg__img" src="assets/01.75056d92.webp" alt="" draggable="false" width="1600" height="1200" />
+                    <!-- render de storefront-animations/src/Step1Diagnosis.tsx -->
+                    <video class="js-hpg-img hpg__img" poster="assets/storefront-layout-poster.webp"
+                        width="1280" height="800" autoplay muted loop playsinline preload="auto"
+                        aria-hidden="true" tabindex="-1" disablepictureinpicture>
+                        <source src="assets/storefront-layout.webm" type="video/webm" />
+                        <source src="assets/storefront-layout.mp4" type="video/mp4" />
+                    </video>
                     <div class="hpg__scrim" aria-hidden="true"></div>
                     <div class="hpg__label">
                         <div class="hpg__label-top">
@@ -1653,8 +1658,13 @@ El sistema para que tu negocio">
                 </article>
 
                 <article class="js-hpg-card hpg__card" aria-label="Paso 2: Te mostramos un mockup real">
-                    <!-- TODO: reemplazar por el asset final de la etapa 2 -->
-                    <img class="js-hpg-img hpg__img" src="assets/05.1cd04b2d.webp" alt="" draggable="false" width="1600" height="1200" />
+                    <!-- render de storefront-animations/src/Step2Roadmap.tsx -->
+                    <video class="js-hpg-img hpg__img" poster="assets/storefront-section-latam-poster.webp"
+                        width="1280" height="800" autoplay muted loop playsinline preload="auto"
+                        aria-hidden="true" tabindex="-1" disablepictureinpicture>
+                        <source src="assets/storefront-section-latam.webm" type="video/webm" />
+                        <source src="assets/storefront-section-latam.mp4" type="video/mp4" />
+                    </video>
                     <div class="hpg__scrim" aria-hidden="true"></div>
                     <div class="hpg__label">
                         <div class="hpg__label-top">
@@ -2226,13 +2236,28 @@ function init(section) {
             vertexShader: vertex,
             fragmentShader: fragment,
         });
-        material.uniforms.uTexture.value = loader.load(el.getAttribute('src'), (t) => {
-            material.uniforms.uImageResolution.value.set(t.image.width, t.image.height);
-        });
+        /* Steps 1-2 are Remotion renders (storefront-animations), step 3 is still a still.
+           A VideoTexture pulls from the same <video> the no-WebGL fallback shows, so there is
+           one source of truth per card — the DOM element is what .hpg.is-gl hides, not a
+           second copy. Its natural size only exists after metadata, hence the listener. */
+        if (el.tagName === 'VIDEO') {
+            const t = new THREE.VideoTexture(el);
+            material.uniforms.uTexture.value = t;
+            const setRes = () => material.uniforms.uImageResolution.value.set(el.videoWidth || 1280, el.videoHeight || 800);
+            if (el.readyState >= 1) setRes(); else el.addEventListener('loadedmetadata', setRes, { once: true });
+        } else {
+            material.uniforms.uTexture.value = loader.load(el.getAttribute('src'), (t) => {
+                material.uniforms.uImageResolution.value.set(t.image.width, t.image.height);
+            });
+        }
         const mesh = new THREE.Mesh(geometry, material);
         group.add(mesh);
         return { el, mesh, material, w: 1, h: 1, left: 0, top: 0 };
     });
+
+    const videos = imgs.filter((el) => el.tagName === 'VIDEO');
+    const reduceMotion = document.documentElement.classList.contains('reduced-motion') ||
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     let vw = 0, vh = 0, limit = 0, headH = 0, active = -1;
     const scroll = { current: 0, target: 0 };
@@ -2317,6 +2342,14 @@ function init(section) {
     let inView = false, rafOn = false;
     new IntersectionObserver((es) => {
         inView = es[0].isIntersecting;
+        /* Two decoders running behind a section nobody is looking at is a battery bill for
+           nothing; browsers do not reliably suspend offscreen video on their own. Under
+           reduced-motion they never start — preload="auto" still leaves a first frame in the
+           texture, so the card reads as a poster instead of going black. */
+        videos.forEach((v) => {
+            if (inView && !reduceMotion) { const p = v.play(); if (p && p.catch) p.catch(() => {}); }
+            else v.pause();
+        });
         if (inView && !rafOn) {
             // no easing back from wherever the loop was parked — enter already in position
             onScroll();
