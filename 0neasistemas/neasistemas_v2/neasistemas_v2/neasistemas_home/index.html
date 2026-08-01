@@ -1455,13 +1455,17 @@ El sistema para que tu negocio">
     /* per-char split, built at runtime (Codrops "Decorative Letter Animations", effect 8 / "Jumbuck") */
     .hpg__title .jb-w { display: inline-block; white-space: nowrap; }
     .hpg__title .jb-c { display: inline-block; will-change: transform, opacity; }
-    /* overflow visible so the ±250px confetti spray isn't clipped to the text box; the mask
-       grounds it around the headline instead of letting it read as uniform noise on black */
-    .hpg__shapes {
-        position: absolute; inset: 0; width: 100%; height: 100%;
-        overflow: visible; pointer-events: none; z-index: 2;
-        -webkit-mask-image: radial-gradient(ellipse 62% 78% at 50% 50%, #000 38%, transparent 100%);
-        mask-image: radial-gradient(ellipse 62% 78% at 50% 50%, #000 38%, transparent 100%);
+    /* Confetti field: sticky so one viewport-sized canvas backs the whole section instead of
+       a multi-screen-tall buffer, and the negative margin keeps it out of the flow so the
+       head still starts at the top of the section. The mask keeps it from reading as uniform
+       noise — it thins out toward the edges and never fights the cards for contrast. */
+    .hpg__confetti {
+        position: sticky; top: 0;
+        display: block; width: 100%; height: 100vh; height: 100svh;
+        margin-bottom: -100vh; margin-bottom: -100svh;
+        pointer-events: none; z-index: 0;
+        -webkit-mask-image: radial-gradient(ellipse 76% 68% at 50% 42%, #000 32%, transparent 94%);
+        mask-image: radial-gradient(ellipse 76% 68% at 50% 42%, #000 32%, transparent 94%);
     }
 
     /* ---------- pinned horizontal gallery ---------- */
@@ -1694,17 +1698,13 @@ El sistema para que tu negocio">
 </section>
 
 <script id="hp-process-title">
-/* Codrops "Decorative Letter Animations", effect index 7 — the demo labels it "Jumbuck".
-   Ported from the anime.js timeline to a scroll-scrubbed render (no anime.js/charming on
-   this page). Original values kept 1:1 — letters: 400ms, easeOutElastic, reverse stagger
-   of 80ms (last letter resolves first), translateY ±80% alternating by index, rotate 90->0,
-   opacity ramped over the first 100ms; shapes: shapesOnTop, 20ms stagger among a letter's
-   own shapes, duration random 1000-3000ms, easeOutElastic, translateX/Y random ±250,
-   FIXED random scale 0.1-0.6, rotate ±90, opacity settling at 0.6 — i.e. the confetti
-   stays put once it lands, which is what makes this effect read as Jumbuck and not as
-   the burst-and-vanish ones. Two departures: the palette is the section's own tokens
-   (black is dropped, it is the backdrop here) and 6 shapes per letter instead of 10 —
-   the demo animates one word, this is a whole sentence and they never fade out. */
+/* Codrops "Decorative Letter Animations", effect index 7 (the demo labels it "Jumbuck") —
+   letters only. The confetti that shipped with the effect used to be per-letter SVG shapes
+   welded to the headline box; it now lives in #hp-process-confetti as a section-wide,
+   pointer-reactive canvas field, so this block is just the type animation.
+   Original values kept 1:1 — 360ms per letter, easeOutElastic, reverse stagger of 55ms
+   (last letter resolves first), translateY ±80% alternating by index, rotate 90->0,
+   opacity ramped over the first 100ms. */
 (function () {
     var section = document.querySelector('.hpg');
     if (!section) return;
@@ -1716,18 +1716,8 @@ El sistema para que tu negocio">
         window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (reduce) return;
 
-    var SVGNS = 'http://www.w3.org/2000/svg';
-    var SHAPE_TYPES = ['circle', 'rect', 'polygon'];
-    var SHAPE_COLORS = ['#EFECE7', '#FFB400', '#F63E02', '#246EB9'];
-    // 6 per letter reads as confetti on a wide headline; phones get a third of the nodes
-    var SHAPES_PER_LETTER = window.matchMedia('(min-width: 768px)').matches ? 6 : 2;
-    /* Tightened from the demo's 400/80/20/1000: on a full sentence the original cadence
-       stretched the timeline past 5s and the tail read as sluggish. Same shapes, ~40% quicker. */
-    var L_DUR = 360, L_STAGGER = 55, S_STAGGER = 14, S_FADE_IN = 620;
-    var S_DUR_MIN = 800, S_DUR_MAX = 2000;
+    var L_DUR = 360, L_STAGGER = 55;
 
-    function rnd(a, b) { return a + Math.random() * (b - a); }
-    function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
     function clamp01(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
     // anime.js easeOutElastic defaults: amplitude 1, period .5
     function easeOutElastic(t) {
@@ -1771,115 +1761,36 @@ El sistema para que tu negocio">
     var spans = splitChars(title);
     if (!spans.length) return;
 
-    var shapeSvg = document.createElementNS(SVGNS, 'svg');
-    shapeSvg.setAttribute('class', 'hpg__shapes');
-    shapeSvg.setAttribute('aria-hidden', 'true');
-    title.parentNode.insertBefore(shapeSvg, title.nextSibling); // shapesOnTop: true
-
-    var chars = spans.map(function (c) {
-        var shapes = [];
-        for (var s = 0; s < SHAPES_PER_LETTER; s++) {
-            var type = pick(SHAPE_TYPES);
-            var el = document.createElementNS(SVGNS, type);
-            el.setAttribute('fill', pick(SHAPE_COLORS));
-            el.style.opacity = 0;
-            shapeSvg.appendChild(el);
-            shapes.push({
-                el: el, type: type,
-                rw: rnd(.05, .5), rh: rnd(.05, .5),      // rect size, fraction of the letter box
-                dx: rnd(-250, 250), dy: rnd(-250, 250),
-                sc: rnd(.1, .6), rot: rnd(-90, 90),
-                dur: rnd(S_DUR_MIN, S_DUR_MAX),
-                // the demo lands every shape on a flat 0.6; spreading it gives the cloud depth
-                op: rnd(.32, .72)
-            });
-        }
-        return { el: c, shapes: shapes };
+    var chars = spans.map(function (c, i) {
+        return {
+            el: c,
+            delay: (spans.length - 1 - i) * L_STAGGER,  // last letter resolves first
+            dir: i % 2 === 0 ? -1 : 1,
+            done: false
+        };
     });
+    var TOTAL = Math.max(1, (chars.length - 1) * L_STAGGER + L_DUR);
 
-    var SHAPE_SPAN = (SHAPES_PER_LETTER - 1) * S_STAGGER + S_DUR_MAX;
-    function totalFrames() {
-        return Math.max(1, (chars.length - 1) * L_STAGGER + Math.max(L_DUR, SHAPE_SPAN));
-    }
-
-    /* Shapes live in the SVG's user space, so their geometry is re-derived from the letter
-       boxes whenever those move. Transforms are cleared first — otherwise we would measure
-       a mid-animation rotated box. */
-    function layoutShapes() {
-        chars.forEach(function (d) { d.el.style.transform = 'none'; });
-        var base = shapeSvg.getBoundingClientRect();
-        chars.forEach(function (d) {
-            var r = d.el.getBoundingClientRect();
-            var left = r.left - base.left, top = r.top - base.top, w = r.width, h = r.height;
-            var cx = left + w / 2, cy = top + h / 2;
-            d.shapes.forEach(function (s) {
-                s.el.style.transformOrigin = cx + 'px ' + cy + 'px';
-                if (s.type === 'circle') {
-                    s.el.setAttribute('r', w * .5);
-                    s.el.setAttribute('cx', cx); s.el.setAttribute('cy', cy);
-                } else if (s.type === 'rect') {
-                    var rw = s.rw * w, rh = s.rh * h;
-                    s.el.setAttribute('width', rw); s.el.setAttribute('height', rh);
-                    s.el.setAttribute('x', cx - rw / 2); s.el.setAttribute('y', cy - rh / 2);
-                } else {
-                    s.el.setAttribute('points',
-                        left + ' ' + (top + h) + ', ' + (left + w / 2) + ' ' + (top + h - w) + ', ' + (left + w) + ' ' + (top + h));
-                }
-            });
-        });
-    }
-
-    /* Per-element cursors: once a letter (or one of its shapes) has reached the end of its
-       own tween it is written one last time and then skipped. Scrubbing every one of the
-       ~250 nodes on every frame is what made this feel gluey — after ~5s the whole thing is
-       static and the loop shuts itself off. */
+    /* Per-letter cursors: once a letter reaches the end of its own tween it is written one
+       last time and then skipped, so the loop thins out instead of scrubbing every node. */
     function render(ms, force) {
-        var n = chars.length;
-        for (var i = 0; i < n; i++) {
+        for (var i = 0; i < chars.length; i++) {
             var d = chars[i];
             if (d.done && !force) continue;
             var lms = ms - d.delay;
-
-            if (!d.letterDone || force) {
-                var lp = clamp01(lms / L_DUR);
-                var back = 1 - easeOutElastic(lp);
-                d.el.style.opacity = clamp01(lms / 100).toFixed(3);
-                // translate3d keeps each letter on its own composited layer while it moves
-                d.el.style.transform = 'translate3d(0,' + (d.dir * 80 * back).toFixed(2) + '%,0) rotate(' + (90 * back).toFixed(2) + 'deg)';
-                if (lp >= 1) d.letterDone = true;
-            }
-
-            var allDone = d.letterDone;
-            for (var j = 0; j < d.shapes.length; j++) {
-                var s = d.shapes[j];
-                if (s.done && !force) continue;
-                var sms = lms - j * S_STAGGER;
-                if (sms <= 0) { s.el.style.opacity = 0; allDone = false; continue; }
-                var sp = clamp01(sms / s.dur);
-                var m = easeOutElastic(sp);
-                s.el.style.opacity = (clamp01(sms / S_FADE_IN) * s.op).toFixed(3);
-                s.el.style.transform = 'translate(' + (s.dx * m).toFixed(1) + 'px,' + (s.dy * m).toFixed(1) + 'px) rotate(' + (s.rot * m).toFixed(1) + 'deg) scale(' + s.sc.toFixed(2) + ')';
-                if (sp >= 1 && sms >= S_FADE_IN) s.done = true; else allDone = false;
-            }
-            d.done = allDone;
+            var lp = clamp01(lms / L_DUR);
+            var back = 1 - easeOutElastic(lp);
+            d.el.style.opacity = clamp01(lms / 100).toFixed(3);
+            // translate3d keeps each letter on its own composited layer while it moves
+            d.el.style.transform = 'translate3d(0,' + (d.dir * 80 * back).toFixed(2) + '%,0) rotate(' + (90 * back).toFixed(2) + 'deg)';
+            if (lp >= 1) d.done = true;
         }
     }
 
-    function resetCursors() {
-        chars.forEach(function (d) {
-            d.done = false; d.letterDone = false;
-            d.shapes.forEach(function (s) { s.done = false; });
-        });
-    }
+    function resetCursors() { chars.forEach(function (d) { d.done = false; }); }
 
-    chars.forEach(function (d, i) {
-        d.delay = (chars.length - 1 - i) * L_STAGGER;   // last letter resolves first
-        d.dir = i % 2 === 0 ? -1 : 1;
-    });
-
-    /* One-shot, wall-clock timeline — the original is a timed anime.js sequence, and an
-       elastic ease scrubbed by the scroll wheel never lands the same way twice. */
-    var TOTAL = totalFrames();
+    /* One-shot, wall-clock timeline — an elastic ease scrubbed by the scroll wheel never
+       lands the same way twice. */
     var start = 0, playing = false, elapsed = 0;
 
     function loop(now) {
@@ -1890,15 +1801,9 @@ El sistema para que tu negocio">
         else { playing = false; elapsed = TOTAL; }
     }
 
-    layoutShapes();
     render(0, true);
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () {
-        layoutShapes(); resetCursors(); render(elapsed, true);
-    });
-    var relayout;
-    window.addEventListener('resize', function () {
-        clearTimeout(relayout);
-        relayout = setTimeout(function () { layoutShapes(); resetCursors(); render(playing ? elapsed : TOTAL, true); }, 120);
+        resetCursors(); render(elapsed, true);
     });
 
     /* Replays on every visit: arm when the head has left the viewport completely (rewinding
@@ -1915,8 +1820,205 @@ El sistema para que tu negocio">
             playing = true;
             start = performance.now();
             requestAnimationFrame(loop);
+            section.dispatchEvent(new CustomEvent('hpg:enter'));   // confetti burst rides along
         }
     }, { threshold: [0, 0.35] }).observe(head);
+})();
+</script>
+
+<script id="hp-process-confetti">
+/* Section-wide confetti field. Replaces the per-letter SVG shapes of the Jumbuck effect:
+   same four tokens, same "it lands and stays" character, but spread over the whole black
+   backdrop and driven by a small physics loop instead of a fixed timeline.
+
+   Per particle: an anchor it always wants to return to (spring), a slow idle orbit so the
+   field breathes when nobody touches it, depth (z) that scales size, parallax and how hard
+   it answers the pointer, and rotation coupled to its own speed.
+   The pointer contributes two forces — radial push-away, and its own velocity as wind, so a
+   fast swipe throws confetti in the direction of the gesture instead of only shoving it.
+
+   One canvas, sticky over the section, 2D context. ponytail: the GL layer next door is for
+   the card gallery; a backdrop of ~150 flat sprites does not need a second WebGL context. */
+(function () {
+    var section = document.querySelector('.hpg');
+    if (!section) return;
+
+    var COLORS = ['#EFECE7', '#FFB400', '#F63E02', '#246EB9'];
+    var reduce = document.documentElement.classList.contains('reduced-motion') ||
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    var canvas = document.createElement('canvas');
+    canvas.className = 'hpg__confetti';
+    canvas.setAttribute('aria-hidden', 'true');
+    section.insertBefore(canvas, section.firstChild);
+    var ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    var coarse = window.matchMedia('(pointer: coarse)').matches;
+    // phones carry a third of the nodes and skip the pointer field entirely
+    var COUNT = coarse ? 48 : (window.innerWidth < 900 ? 96 : 156);
+    /* The push and the spring fight each other: a particle parks where PUSH*falloff*z equals
+       SPRING*displacement, so these two numbers set how wide the hole around the cursor opens
+       (~80px at half-radius here). Raising SPRING tightens the field back up but shrinks the
+       hole — tune them as a pair, not one at a time. */
+    var R = 240;            // pointer influence radius, px
+    var PUSH = 4.6;         // radial repulsion
+    var WIND = 0.35;        // share of pointer velocity handed to nearby particles
+    var SPRING = 0.014;     // pull back to the anchor
+    var DAMP = 0.905;
+    var PARALLAX = 90;      // px of scroll-linked drift at z = 1
+
+    var W = 0, H = 0, dpr = 1, parts = [];
+
+    function rnd(a, b) { return a + Math.random() * (b - a); }
+
+    function build() {
+        parts = [];
+        for (var i = 0; i < COUNT; i++) {
+            var z = rnd(.35, 1);
+            parts.push({
+                ax: Math.random(), ay: Math.random(),   // anchor, normalized so resize keeps the spread
+                x: 0, y: 0, vx: 0, vy: 0,
+                z: z,
+                size: rnd(3.5, 13) * z,
+                type: i % 3,                            // 0 circle, 1 rect, 2 triangle
+                color: COLORS[(Math.random() * COLORS.length) | 0],
+                rot: rnd(0, Math.PI * 2), spin: rnd(-.006, .006),
+                alpha: rnd(.3, .78) * (.55 + .45 * z),
+                ph: rnd(0, Math.PI * 2),                // idle orbit phase
+                orb: rnd(5, 22) * z,
+                spd: rnd(.00012, .0004)
+            });
+        }
+    }
+
+    function resize() {
+        var r = canvas.getBoundingClientRect();
+        W = r.width; H = r.height;
+        if (!W || !H) return;
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+        canvas.width = Math.round(W * dpr);
+        canvas.height = Math.round(H * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        parts.forEach(function (p) {          // re-seat, keep whatever velocity it had
+            if (!p.seeded) { p.x = p.ax * W; p.y = p.ay * H; p.seeded = true; }
+        });
+    }
+
+    // pointer, lerped: px/py trail the real cursor so the wind term is a real velocity
+    var tpx = -9999, tpy = -9999, px = tpx, py = tpy, pvx = 0, pvy = 0, hasPointer = false;
+    if (!coarse && !reduce) {
+        window.addEventListener('pointermove', function (e) {
+            var r = canvas.getBoundingClientRect();
+            tpx = e.clientX - r.left; tpy = e.clientY - r.top;
+            if (!hasPointer) { px = tpx; py = tpy; hasPointer = true; }
+        }, { passive: true });
+        window.addEventListener('pointerleave', function () { hasPointer = false; tpx = tpy = -9999; }, { passive: true });
+    }
+
+    /* Entry burst: the field is thrown outward from the middle of the headline and the
+       springs reel it back in — the spray of the original effect, without a timeline. */
+    section.addEventListener('hpg:enter', function () {
+        for (var i = 0; i < parts.length; i++) {
+            var p = parts[i];
+            var a = Math.random() * Math.PI * 2, s = rnd(3, 11) * p.z;
+            p.x = W * .5 + Math.cos(a) * rnd(0, 60);
+            p.y = H * .42 + Math.sin(a) * rnd(0, 60);
+            p.vx = Math.cos(a) * s; p.vy = Math.sin(a) * s;
+            p.spin = rnd(-.05, .05);
+        }
+        fade = 0;
+    });
+
+    function draw(p) {
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot);
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = p.alpha * fade;
+        var s = p.size;
+        if (p.type === 0) { ctx.beginPath(); ctx.arc(0, 0, s * .5, 0, Math.PI * 2); ctx.fill(); }
+        else if (p.type === 1) { ctx.fillRect(-s * .5, -s * .34, s, s * .68); }
+        else {
+            ctx.beginPath();
+            ctx.moveTo(0, -s * .6); ctx.lineTo(s * .55, s * .45); ctx.lineTo(-s * .55, s * .45);
+            ctx.closePath(); ctx.fill();
+        }
+        ctx.restore();
+    }
+
+    var fade = 0, running = false, last = 0;
+
+    function frame(now) {
+        if (!running) return;
+        var dt = Math.min(now - last, 50) / 16.667;    // in frames, clamped over tab switches
+        last = now;
+        fade += (1 - fade) * .05;
+
+        // scroll progress across the section drives the depth parallax
+        var r = section.getBoundingClientRect();
+        var prog = r.height > H ? Math.min(Math.max(-r.top / (r.height - H), 0), 1) : 0;
+
+        if (hasPointer) { pvx = (tpx - px) * .22; pvy = (tpy - py) * .22; px += pvx; py += pvy; }
+        else { pvx = pvy = 0; }
+
+        ctx.clearRect(0, 0, W, H);
+
+        for (var i = 0; i < parts.length; i++) {
+            var p = parts[i];
+            // anchor + idle orbit + parallax = where this particle wants to be right now
+            var t = now * p.spd;
+            var bx = p.ax * W + Math.cos(t + p.ph) * p.orb;
+            var by = p.ay * H + Math.sin(t * 1.3 + p.ph) * p.orb - prog * PARALLAX * p.z;
+
+            if (hasPointer) {
+                var dx = p.x - px, dy = p.y - py, d2 = dx * dx + dy * dy;
+                if (d2 < R * R) {
+                    var d = Math.sqrt(d2) || 1;
+                    var f = 1 - d / R; f *= f;              // quadratic falloff
+                    var react = f * p.z;
+                    p.vx += (dx / d) * PUSH * react + pvx * WIND * react;
+                    p.vy += (dy / d) * PUSH * react + pvy * WIND * react;
+                    p.spin += (pvx * .0009 + f * .002) * p.z;
+                }
+            }
+
+            p.vx += (bx - p.x) * SPRING;
+            p.vy += (by - p.y) * SPRING;
+            p.vx *= DAMP; p.vy *= DAMP;
+            p.x += p.vx * dt; p.y += p.vy * dt;
+
+            // spin settles back toward its lazy idle rate instead of ringing forever
+            p.spin += (0 - p.spin) * .012;
+            p.rot += (p.spin + Math.hypot(p.vx, p.vy) * .002) * dt;
+
+            draw(p);
+        }
+        requestAnimationFrame(frame);
+    }
+
+    build();
+    resize();
+
+    if (reduce) {                     // one static, pointer-deaf frame
+        fade = 1;
+        parts.forEach(function (p) { p.x = p.ax * W; p.y = p.ay * H; draw(p); });
+        return;
+    }
+
+    var relayout;
+    window.addEventListener('resize', function () {
+        clearTimeout(relayout);
+        relayout = setTimeout(resize, 140);
+    }, { passive: true });
+
+    /* The loop only runs while the section is on screen — this is a backdrop, it has no
+       business burning frames three viewports away. */
+    new IntersectionObserver(function (es) {
+        var on = es[es.length - 1].isIntersecting;
+        if (on && !running) { running = true; last = performance.now(); requestAnimationFrame(frame); }
+        else if (!on) { running = false; }
+    }, { threshold: 0 }).observe(section);
 })();
 </script>
 
