@@ -2,171 +2,114 @@ import { Counter, ease } from "./kinetic";
 import { AMBER, HAIRLINE, INK, INK_SOFT, VERMILION } from "./theme";
 
 // Every figure here is illustrative: this is a product mock, not a client
-// report, so nothing is framed as something our clients actually did.
+// report, so nothing is framed as something a real client actually did.
+
+// The goal picked in act 1 is the same one act 4 answers. That thread is the
+// whole argument of the film: the site is built for a stated objective.
+export const OBJETIVO = "Vender más seguido";
 
 const caption: React.CSSProperties = {
-  fontSize: 13,
-  fontWeight: 600,
+  fontSize: 12.5,
+  fontWeight: 700,
   color: INK_SOFT,
-  letterSpacing: "0.02em",
+  letterSpacing: "0.14em",
 };
 
-/* ── SÍNTOMA ──────────────────────────────────────────────────────────────
-   Same work every month, wildly different result. One flat dashed line over
-   a ragged bar chart says it faster than any sentence could.              */
-
-const MONTHS = ["E", "F", "M", "A", "M", "J", "J", "A"];
-const SALES = [52, 88, 41, 63, 35, 79, 44, 58];
-const S_W = 32;
-const S_GAP = 26;
-const S_H = 104;
-const EFFORT = 62; // the flat line: effort never changes
-
-export const SintomaPanel = ({ t }: { t: number }) => {
-  const lineIn = ease(t, [26, 56], [0, 1]);
-  return (
-    <div style={{ position: "relative", width: (S_W + S_GAP) * MONTHS.length }}>
-      <div
-        style={{
-          position: "relative",
-          height: S_H,
-          display: "flex",
-          gap: S_GAP,
-          alignItems: "flex-end",
-        }}
-      >
-        {SALES.map((v, i) => {
-          const h = ease(t, [4 + i * 4, 34 + i * 4], [0, (v / 100) * S_H]);
-          return (
-            <div key={i} style={{ width: S_W, height: h, background: INK }} />
-          );
-        })}
-        <div
-          style={{
-            position: "absolute",
-            left: 0,
-            bottom: (EFFORT / 100) * S_H,
-            width: `${lineIn * 100}%`,
-            borderTop: `2px dashed ${VERMILION}`,
-          }}
-        />
-      </div>
-      <div style={{ display: "flex", gap: S_GAP, marginTop: 8 }}>
-        {MONTHS.map((m, i) => (
-          <div
-            key={i}
-            style={{
-              ...caption,
-              width: S_W,
-              textAlign: "center",
-              opacity: ease(t, [8 + i * 4, 20 + i * 4], [0, 1]),
-            }}
-          >
-            {m}
-          </div>
-        ))}
-      </div>
-      <div
-        style={{
-          display: "flex",
-          gap: 22,
-          marginTop: 16,
-          opacity: ease(t, [50, 66], [0, 1]),
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <div style={{ width: 16, height: 7, background: INK }} />
-          <span style={caption}>lo que vendiste</span>
-        </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <div style={{ width: 16, borderTop: `2px dashed ${VERMILION}` }} />
-          <span style={{ ...caption, color: VERMILION }}>
-            el trabajo que pusiste
-          </span>
-        </div>
-      </div>
-    </div>
-  );
+const body: React.CSSProperties = {
+  fontSize: 15,
+  fontWeight: 600,
+  color: INK,
+  letterSpacing: "-0.01em",
 };
 
-/* ── EVIDENCIA ────────────────────────────────────────────────────────────
-   What you push vs what actually sells, on a shared scale so the inversion
-   is impossible to miss. The row that contradicts you gets the accent.    */
+/* ── EMPEZAMOS POR VOS ────────────────────────────────────────────────────
+   What the business is and what it wants. The objective is a choice among
+   real alternatives, not a slogan, so it lands as a decision.             */
 
-const ITEMS = [
-  { name: "El combo que armaste", push: 0.88, sells: 0.31 },
-  { name: "La promo del mes", push: 0.72, sells: 0.24 },
-  { name: "Retirar en el local", push: 0.14, sells: 0.91, star: true },
+const FACTS = [
+  { k: "RUBRO", v: "Indumentaria" },
+  { k: "LE VENDE A", v: "Mujeres de 25 a 40" },
 ];
 
-const Bar = ({
-  p,
-  color,
-  delay,
-  t,
-}: {
-  p: number;
-  color: string;
-  delay: number;
-  t: number;
-}) => (
-  <div style={{ height: 7, background: HAIRLINE, position: "relative" }}>
+const GOALS = [
+  "Vender más seguido",
+  "Abrir un segundo local",
+  "Vender más caro",
+];
+
+export const NegocioPanel = ({ t, w }: { t: number; w: number }) => (
+  <div style={{ width: w }}>
+    <div style={{ display: "flex", gap: 34 }}>
+      {FACTS.map((f, i) => (
+        <div
+          key={f.k}
+          style={{
+            display: "flex",
+            alignItems: "baseline",
+            gap: 8,
+            opacity: ease(t, [2 + i * 8, 16 + i * 8], [0, 1]),
+          }}
+        >
+          <span style={caption}>{f.k}</span>
+          <span style={body}>{f.v}</span>
+        </div>
+      ))}
+    </div>
     <div
       style={{
-        position: "absolute",
-        inset: 0,
-        width: `${ease(t, [delay, delay + 34], [0, p]) * 100}%`,
-        background: color,
+        height: 1,
+        background: HAIRLINE,
+        margin: "14px 0 12px",
+        width: `${ease(t, [16, 40], [0, 100])}%`,
       }}
     />
-  </div>
-);
-
-export const EvidenciaPanel = ({ t, w }: { t: number; w: number }) => (
-  <div style={{ width: w }}>
+    <div style={{ ...caption, opacity: ease(t, [22, 34], [0, 1]) }}>
+      QUÉ QUIERE LOGRAR
+    </div>
     <div
       style={{
         display: "flex",
-        gap: 22,
-        marginBottom: 15,
-        opacity: ease(t, [2, 16], [0, 1]),
+        flexDirection: "column",
+        gap: 6,
+        marginTop: 9,
       }}
     >
-      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-        <div style={{ width: 16, height: 7, background: AMBER }} />
-        <span style={caption}>lo que promocionás</span>
-      </div>
-      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-        <div style={{ width: 16, height: 7, background: INK }} />
-        <span style={caption}>lo que te compran</span>
-      </div>
-    </div>
-    <div style={{ display: "flex", flexDirection: "column", gap: 15 }}>
-      {ITEMS.map((it, i) => {
-        const d = 10 + i * 8;
+      {GOALS.map((g, i) => {
+        const start = 30 + i * 9;
+        const picked = g === OBJETIVO;
+        // the chosen one only fills once the alternatives are on screen
+        const fill = picked ? ease(t, [62, 82], [0, 1]) : 0;
         return (
           <div
-            key={it.name}
-            style={{ display: "flex", flexDirection: "column", gap: 5 }}
+            key={g}
+            style={{
+              position: "relative",
+              padding: "7px 14px",
+              border: `1.5px solid ${picked && fill > 0.5 ? VERMILION : HAIRLINE}`,
+              opacity: ease(t, [start, start + 16], [0, 1]),
+              translate: `${ease(t, [start, start + 24], [18, 0])}px 0`,
+              overflow: "hidden",
+            }}
           >
             <div
               style={{
+                position: "absolute",
+                inset: 0,
+                background: VERMILION,
+                width: `${fill * 100}%`,
+              }}
+            />
+            <div
+              style={{
+                position: "relative",
                 fontSize: 15,
-                fontWeight: it.star ? 700 : 600,
-                color: it.star ? VERMILION : INK_SOFT,
+                fontWeight: picked ? 700 : 600,
                 letterSpacing: "-0.01em",
-                opacity: ease(t, [d, d + 12], [0, 1]),
+                color: picked && fill > 0.55 ? "#fff" : INK_SOFT,
               }}
             >
-              {it.name}
+              {g}
             </div>
-            <Bar t={t} p={it.push} color={AMBER} delay={d} />
-            <Bar
-              t={t}
-              p={it.sells}
-              color={it.star ? VERMILION : INK}
-              delay={d + 6}
-            />
           </div>
         );
       })}
@@ -174,146 +117,207 @@ export const EvidenciaPanel = ({ t, w }: { t: number; w: number }) => (
   </div>
 );
 
-/* ── CAUSA ────────────────────────────────────────────────────────────────
-   The gap between when the question arrives and when it gets answered. The
-   bracket is the whole point of the panel.                                */
+/* ── MIRAMOS AFUERA ───────────────────────────────────────────────────────
+   The competitor grid. Filled dot = resuelto. Your row is last and mostly
+   hollow, which is the finding: the gap is visible without a sentence.    */
 
-const WEEK = [30, 92, 54, 44, 61, 36, 22];
-const DAYS = ["L", "M", "M", "J", "V", "S", "D"];
-const IN_DAY = 1; // martes: the consultas land
-const OUT_DAY = 3; // jueves: when they get answered
-const C_W = 344;
-const C_H = 106;
+const CHECKS = ["precio", "respuesta", "envío", "reseñas"];
+const GRID = [
+  { name: "Competidor A", has: [1, 1, 1, 0] },
+  { name: "Competidor B", has: [1, 0, 1, 1] },
+  { name: "Competidor C", has: [1, 1, 0, 1] },
+  { name: "Tu sitio hoy", has: [0, 0, 1, 0], you: true },
+];
+const NAME_W = 150;
+const CELL_W = 78;
 
-export const CausaPanel = ({ t }: { t: number }) => {
-  const pts = WEEK.map((v, i) => ({
-    x: (i / (WEEK.length - 1)) * C_W,
-    y: C_H - (v / 100) * C_H,
-  }));
-  const draw = ease(t, [4, 44], [0, 1]);
-  const a = pts[IN_DAY];
-  const b = pts[OUT_DAY];
-  const br = ease(t, [34, 56], [0, 1]);
-  const top = -30;
-
-  return (
-    <div style={{ position: "relative", width: C_W + 140, paddingTop: 40 }}>
-      <svg width={C_W + 140} height={C_H + 32} style={{ overflow: "visible" }}>
-        {[0, 0.5, 1].map((f) => (
-          <line
-            key={f}
-            x1={0}
-            x2={C_W}
-            y1={C_H * f}
-            y2={C_H * f}
-            stroke={HAIRLINE}
-            strokeWidth={1}
-          />
-        ))}
-        <polyline
-          points={pts.map((p) => `${p.x},${p.y}`).join(" ")}
-          fill="none"
-          stroke={INK}
-          strokeWidth={2.5}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          pathLength={1}
-          strokeDasharray={1}
-          strokeDashoffset={1 - draw}
-        />
-        {pts.map((p, i) => {
-          const key = i === IN_DAY || i === OUT_DAY;
-          return (
-            <circle
-              key={i}
-              cx={p.x}
-              cy={p.y}
-              r={key ? 5.5 : 3}
-              fill={i === IN_DAY ? VERMILION : "#fff"}
-              stroke={key ? VERMILION : INK}
-              strokeWidth={2}
-              opacity={ease(t, [8 + i * 5, 20 + i * 5], [0, 1])}
-            />
-          );
-        })}
-        {pts.map((p, i) => (
-          <text
-            key={`d${i}`}
-            x={p.x}
-            y={C_H + 25}
-            textAnchor="middle"
-            fontSize={13}
-            fontWeight={i === IN_DAY || i === OUT_DAY ? 700 : 600}
-            fill={i === IN_DAY || i === OUT_DAY ? VERMILION : INK_SOFT}
-            opacity={ease(t, [10 + i * 5, 22 + i * 5], [0, 1])}
-          >
-            {DAYS[i]}
-          </text>
-        ))}
-        {/* the wait itself, drawn as a bracket spanning the two days */}
-        <path
-          d={`M ${a.x} ${a.y - 14} L ${a.x} ${top} L ${a.x + (b.x - a.x) * br} ${top}`}
-          fill="none"
-          stroke={VERMILION}
-          strokeWidth={1.5}
-          opacity={br}
-        />
-        <path
-          d={`M ${b.x} ${top} L ${b.x} ${b.y - 14}`}
-          fill="none"
-          stroke={VERMILION}
-          strokeWidth={1.5}
-          opacity={ease(t, [56, 66], [0, 1])}
-        />
-      </svg>
-
-      <div
-        style={{
-          position: "absolute",
-          left: b.x + 40,
-          top: 6,
-          width: 150,
-          opacity: ease(t, [60, 76], [0, 1]),
-          translate: `${ease(t, [60, 76], [-8, 0])}px 0`,
-        }}
-      >
+export const CompetenciaPanel = ({ t }: { t: number }) => (
+  <div style={{ width: NAME_W + CHECKS.length * CELL_W }}>
+    <div style={{ display: "flex", opacity: ease(t, [2, 16], [0, 1]) }}>
+      <div style={{ width: NAME_W }} />
+      {CHECKS.map((c) => (
         <div
+          key={c}
           style={{
-            fontSize: 32,
-            fontWeight: 800,
-            color: VERMILION,
-            letterSpacing: "-0.04em",
-            lineHeight: 1,
+            ...caption,
+            width: CELL_W,
+            textAlign: "center",
+            letterSpacing: "0.06em",
           }}
         >
-          <Counter
-            t={t}
-            from={0}
-            to={48}
-            start={60}
-            duration={28}
-            suffix=" h"
-          />
+          {c}
         </div>
-        <div style={{ ...caption, marginTop: 5, lineHeight: 1.35 }}>
-          esperando una respuesta
+      ))}
+    </div>
+    {GRID.map((row, ri) => {
+      const start = 10 + ri * 10;
+      return (
+        <div
+          key={row.name}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            height: 34,
+            borderTop: `1px solid ${HAIRLINE}`,
+            opacity: ease(t, [start, start + 16], [0, 1]),
+          }}
+        >
+          <div
+            style={{
+              width: NAME_W,
+              fontSize: 15,
+              fontWeight: row.you ? 700 : 600,
+              letterSpacing: "-0.01em",
+              color: row.you ? VERMILION : INK_SOFT,
+            }}
+          >
+            {row.name}
+          </div>
+          {row.has.map((h, ci) => {
+            const d = start + 8 + ci * 5;
+            const on = ease(t, [d, d + 14], [0, 1]);
+            const color = row.you ? VERMILION : INK;
+            return (
+              <div
+                key={ci}
+                style={{
+                  width: CELL_W,
+                  display: "flex",
+                  justifyContent: "center",
+                }}
+              >
+                <div
+                  style={{
+                    width: 12,
+                    height: 12,
+                    borderRadius: 8,
+                    border: `2px solid ${h ? color : HAIRLINE}`,
+                    background: h ? color : "transparent",
+                    scale: on,
+                  }}
+                />
+              </div>
+            );
+          })}
+        </div>
+      );
+    })}
+  </div>
+);
+
+/* ── JUNTAMOS LOS DATOS ───────────────────────────────────────────────────
+   Sources the business already has, converging into one number. The bracket
+   on the left is what makes it read as "junto" instead of "una lista".    */
+
+const SOURCES = [
+  { name: "Ventas del último año", n: 1240 },
+  { name: "Chats de WhatsApp", n: 3480 },
+  { name: "Visitas al sitio", n: 9120 },
+  { name: "Reseñas y comentarios", n: 86 },
+];
+const ROW_H = 32;
+
+export const DatosPanel = ({ t, w }: { t: number; w: number }) => {
+  const brace = ease(t, [42, 68], [0, 1]);
+  const listH = SOURCES.length * ROW_H;
+  return (
+    <div style={{ width: w, display: "flex", gap: 18 }}>
+      <div style={{ position: "relative", width: 18, height: listH }}>
+        <div
+          style={{
+            position: "absolute",
+            left: 0,
+            top: listH / 2 - (listH / 2) * brace,
+            width: 2,
+            height: listH * brace,
+            background: VERMILION,
+          }}
+        />
+        <div
+          style={{
+            position: "absolute",
+            left: 0,
+            top: listH / 2 - 1,
+            width: 18 * ease(t, [62, 76], [0, 1]),
+            height: 2,
+            background: VERMILION,
+          }}
+        />
+      </div>
+      <div style={{ flex: 1 }}>
+        {SOURCES.map((s, i) => {
+          const start = 6 + i * 9;
+          return (
+            <div
+              key={s.name}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                height: ROW_H,
+                borderBottom: `1px solid ${HAIRLINE}`,
+                opacity: ease(t, [start, start + 16], [0, 1]),
+              }}
+            >
+              <span style={{ ...body, fontWeight: 600, color: INK_SOFT }}>
+                {s.name}
+              </span>
+              <Counter
+                t={t}
+                from={0}
+                to={s.n}
+                start={start}
+                duration={40}
+                grouped
+                style={{
+                  fontSize: 18,
+                  fontWeight: 700,
+                  color: INK,
+                  letterSpacing: "-0.02em",
+                }}
+              />
+            </div>
+          );
+        })}
+        <div
+          style={{
+            marginTop: 12,
+            display: "flex",
+            alignItems: "baseline",
+            gap: 10,
+            opacity: ease(t, [66, 82], [0, 1]),
+          }}
+        >
+          <span
+            style={{
+              fontSize: 26,
+              fontWeight: 800,
+              color: VERMILION,
+              letterSpacing: "-0.04em",
+            }}
+          >
+            <Counter t={t} from={0} to={13926} start={66} duration={30} grouped />
+          </span>
+          <span style={{ ...caption, letterSpacing: "0.08em" }}>
+            SEÑALES DE UN MISMO NEGOCIO
+          </span>
         </div>
       </div>
     </div>
   );
 };
 
-/* ── DECISIÓN ─────────────────────────────────────────────────────────────
-   One ordered list. Only the first item is filled, because the output of a
-   diagnosis is knowing what goes first, not a list of everything.         */
+/* ── RECIÉN AHÍ, LA WEB ───────────────────────────────────────────────────
+   Every decision hangs off the objective chosen in act 1. Only the first is
+   filled: the output of the step is an order, not a list of everything.   */
 
-const FINDINGS = [
-  { n: "01", text: "Contestar el martes, no el jueves", cost: 3 },
-  { n: "02", text: "Poner adelante lo que ya se vende solo", cost: 2 },
-  { n: "03", text: "Volver a los que ya te compraron", cost: 1 },
+const DECISIONS = [
+  { n: "01", text: "Precios y stock a la vista", weight: 3 },
+  { n: "02", text: "Respuesta automática fuera de hora", weight: 2 },
+  { n: "03", text: "Recompra en dos clics", weight: 1 },
 ];
 
-const CostMeter = ({
+const Meter = ({
   level,
   lead,
   t,
@@ -346,58 +350,69 @@ const CostMeter = ({
   </div>
 );
 
-export const DecisionPanel = ({ t, w }: { t: number; w: number }) => (
-  <div style={{ width: w, display: "flex", flexDirection: "column", gap: 9 }}>
-    <div style={{ ...caption, opacity: ease(t, [2, 16], [0, 1]) }}>
-      ordenado por lo que te está costando hoy
+export const WebPanel = ({ t, w }: { t: number; w: number }) => (
+  <div style={{ width: w }}>
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 10,
+        marginBottom: 12,
+        opacity: ease(t, [2, 16], [0, 1]),
+      }}
+    >
+      <span style={{ ...caption, color: AMBER }}>OBJETIVO</span>
+      <span style={{ ...body, fontWeight: 700 }}>{OBJETIVO}</span>
     </div>
-    {FINDINGS.map((f, i) => {
-      const start = 8 + i * 12;
-      const lead = i === 0;
-      const pulse = lead
-        ? 1 + 0.012 * Math.sin(((t - start) / 30) * Math.PI * 2)
-        : 1;
-      return (
-        <div
-          key={f.n}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 16,
-            padding: "11px 18px",
-            background: lead ? VERMILION : "transparent",
-            border: `1.5px solid ${lead ? VERMILION : HAIRLINE}`,
-            opacity: ease(t, [start, start + 18], [0, 1]),
-            translate: `${ease(t, [start, start + 26], [26, 0])}px 0`,
-            scale: pulse,
-          }}
-        >
-          <span
-            style={{
-              fontSize: 20,
-              fontWeight: 800,
-              letterSpacing: "-0.04em",
-              color: lead ? "#fff" : INK_SOFT,
-              fontVariantNumeric: "tabular-nums",
-            }}
-          >
-            {f.n}
-          </span>
+    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+      {DECISIONS.map((d, i) => {
+        const start = 10 + i * 12;
+        const lead = i === 0;
+        const pulse = lead
+          ? 1 + 0.012 * Math.sin(((t - start) / 30) * Math.PI * 2)
+          : 1;
+        return (
           <div
+            key={d.n}
             style={{
-              flex: 1,
-              fontSize: 16,
-              fontWeight: 700,
-              letterSpacing: "-0.02em",
-              color: lead ? "#fff" : INK,
-              lineHeight: 1.25,
+              display: "flex",
+              alignItems: "center",
+              gap: 16,
+              padding: "11px 18px",
+              background: lead ? VERMILION : "transparent",
+              border: `1.5px solid ${lead ? VERMILION : HAIRLINE}`,
+              opacity: ease(t, [start, start + 18], [0, 1]),
+              translate: `${ease(t, [start, start + 26], [26, 0])}px 0`,
+              scale: pulse,
             }}
           >
-            {f.text}
+            <span
+              style={{
+                fontSize: 20,
+                fontWeight: 800,
+                letterSpacing: "-0.04em",
+                color: lead ? "#fff" : INK_SOFT,
+                fontVariantNumeric: "tabular-nums",
+              }}
+            >
+              {d.n}
+            </span>
+            <div
+              style={{
+                flex: 1,
+                fontSize: 16,
+                fontWeight: 700,
+                letterSpacing: "-0.02em",
+                color: lead ? "#fff" : INK,
+                lineHeight: 1.25,
+              }}
+            >
+              {d.text}
+            </div>
+            <Meter level={d.weight} lead={lead} t={t} start={start} />
           </div>
-          <CostMeter level={f.cost} lead={lead} t={t} start={start} />
-        </div>
-      );
-    })}
+        );
+      })}
+    </div>
   </div>
 );

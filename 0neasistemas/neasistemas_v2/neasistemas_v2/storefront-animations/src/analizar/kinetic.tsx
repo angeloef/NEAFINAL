@@ -154,6 +154,7 @@ export const Counter = ({
   prefix = "",
   suffix = "",
   decimals = 0,
+  grouped = false,
   style,
 }: {
   t: number;
@@ -164,13 +165,19 @@ export const Counter = ({
   prefix?: string;
   suffix?: string;
   decimals?: number;
+  grouped?: boolean;
   style?: CSSProperties;
 }) => {
   const v = ease(t, [start, start + duration], [from, to]);
   return (
     <span style={{ fontVariantNumeric: "tabular-nums", ...style }}>
       {prefix}
-      {v.toFixed(decimals)}
+      {grouped
+        ? v.toLocaleString("es-AR", {
+            minimumFractionDigits: decimals,
+            maximumFractionDigits: decimals,
+          })
+        : v.toFixed(decimals)}
       {suffix}
     </span>
   );

@@ -7,10 +7,10 @@ import {
 import { loadFont } from "@remotion/google-fonts/PlusJakartaSans";
 import { Eyebrow, Line, ease } from "./analizar/kinetic";
 import {
-  CausaPanel,
-  DecisionPanel,
-  EvidenciaPanel,
-  SintomaPanel,
+  CompetenciaPanel,
+  DatosPanel,
+  NegocioPanel,
+  WebPanel,
 } from "./analizar/panels";
 import {
   ACTS,
@@ -29,11 +29,22 @@ const { fontFamily } = loadFont();
 
 const TEXT_OUT = 30; // frames before an act ends that its copy starts leaving
 
+// The four acts are the method, in order: learn the business, study the
+// competition, gather the data, and only then design against the objective.
 const SCRIPT = [
-  { eyebrow: "LO QUE MIRAMOS", line: "Ocho meses de ventas antes de tocar nada." },
-  { eyebrow: "LO QUE ENCONTRAMOS", line: "Que no vendés lo que más promocionás." },
-  { eyebrow: "LO QUE TE MOSTRAMOS", line: "Dónde se te está cayendo la venta." },
-  { eyebrow: "CON QUÉ SALÍS", line: "Tres prioridades y un orden." },
+  {
+    eyebrow: "EMPEZAMOS POR VOS",
+    line: "Qué vendés, a quién y qué querés lograr.",
+  },
+  {
+    eyebrow: "MIRAMOS AFUERA",
+    line: "Contra quién competís de verdad.",
+  },
+  {
+    eyebrow: "JUNTAMOS LOS DATOS",
+    line: "Lo que tu negocio ya sabe, junto.",
+  },
+  { eyebrow: "RECIÉN AHÍ, LA WEB", line: "Cada decisión apunta a ese objetivo." },
 ];
 
 // The footage window is one object that travels; it is never cut and re-cut.
@@ -210,17 +221,25 @@ export const Step1Analizar = () => {
           />
         </div>
 
-        <div style={{ position: "absolute", left: COL.rightX + 24, top: COL.top }}>
-          {a === 0 ? <SintomaPanel t={t} /> : null}
+        <div
+          style={{ position: "absolute", left: COL.rightX + 24, top: COL.top }}
+        >
+          {a === 0 ? <NegocioPanel t={t} w={COL.rightW - 48} /> : null}
         </div>
-        <div style={{ position: "absolute", left: COL.rightX + 24, top: COL.top }}>
-          {a === 1 ? <EvidenciaPanel t={t} w={COL.rightW - 48} /> : null}
+        <div
+          style={{ position: "absolute", left: COL.rightX + 24, top: COL.top }}
+        >
+          {a === 1 ? <CompetenciaPanel t={t} /> : null}
         </div>
-        <div style={{ position: "absolute", left: COL.rightX + 24, top: COL.top }}>
-          {a === 2 ? <CausaPanel t={t} /> : null}
+        <div
+          style={{ position: "absolute", left: COL.rightX + 24, top: COL.top }}
+        >
+          {a === 2 ? <DatosPanel t={t} w={COL.rightW - 48} /> : null}
         </div>
-        <div style={{ position: "absolute", left: COL.rightX + 24, top: COL.top }}>
-          {a === 3 ? <DecisionPanel t={t} w={COL.rightW - 48} /> : null}
+        <div
+          style={{ position: "absolute", left: COL.rightX + 24, top: COL.top }}
+        >
+          {a === 3 ? <WebPanel t={t} w={COL.rightW - 48} /> : null}
         </div>
       </AbsoluteFill>
     </AbsoluteFill>
