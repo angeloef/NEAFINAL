@@ -1,5 +1,6 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Easing, interpolate } from "remotion";
+import { KineticText, type Enter } from "./letters";
 import { INK, INK_SOFT } from "./theme";
 
 const OUT = Easing.bezier(0.16, 1, 0.3, 1);
@@ -32,6 +33,8 @@ export const Line = ({
   tracking = -0.03,
   leading = 1.06,
   stagger = 4,
+  accent,
+  decoration,
   style,
 }: {
   text: string;
@@ -44,6 +47,10 @@ export const Line = ({
   tracking?: number;
   leading?: number;
   stagger?: number;
+  /** colour for the closing word — the act's meaning, landed on one word */
+  accent?: string;
+  /** drawn inside the accent word's box, so it tracks the text after wrapping */
+  decoration?: (t: number, start: number, h: number) => ReactNode;
   style?: CSSProperties;
 }) => {
   const words = text.split(" ");
@@ -52,13 +59,19 @@ export const Line = ({
       style={{
         display: "flex",
         flexWrap: "wrap",
+        // without this the word boxes stretch to the flex line, and any
+        // decoration anchored to one of them escapes far below the text
+        alignItems: "flex-start",
         columnGap: size * 0.26,
         ...style,
       }}
     >
       {words.map((w, i) => {
-        const from = enter + i * stagger;
-        const y = ease(t, [from, from + 26], [110, 0]);
+        // the closing word lands late and slow, so the eye ends on the meaning
+        const isAccent = accent !== undefined && i === words.length - 1;
+        const from = enter + i * stagger + (isAccent ? 4 : 0);
+        const dur = isAccent ? 20 : 26;
+        const y = ease(t, [from, from + dur], [110, 0]);
         const o = ease(t, [from, from + 14], [0, 1]);
         const xOut =
           exit === undefined
@@ -69,28 +82,52 @@ export const Line = ({
             ? 1
             : ease(t, [exit + i * 2, exit + 20], [1, 0], IN);
         return (
+          // the mask has to clip the word but not the shape drawn around it,
+          // so the decoration is a sibling of the mask, not a child
           <span
             key={i}
-            style={{
-              display: "block",
-              overflow: "hidden",
-              paddingBottom: size * 0.1,
-            }}
+            style={{ position: "relative", display: "inline-block" }}
           >
             <span
               style={{
                 display: "block",
-                fontSize: size,
-                lineHeight: leading,
-                fontWeight: weight,
-                letterSpacing: `${tracking}em`,
-                color,
-                opacity: o * oOut,
-                translate: `${xOut}px ${y}%`,
+                overflow: "hidden",
+                paddingBottom: size * 0.1,
               }}
             >
-              {w}
+              <span
+                style={{
+                  display: "block",
+                  fontSize: size,
+                  lineHeight: leading,
+                  fontWeight: isAccent ? Math.min(weight + 50, 800) : weight,
+                  letterSpacing: `${tracking}em`,
+                  color: isAccent && accent ? accent : color,
+                  opacity: o * oOut,
+                  translate: `${xOut}px ${y}%`,
+                }}
+              >
+                {w}
+              </span>
             </span>
+            {isAccent && decoration ? (
+              // an explicit one-line box: the shape must not inherit whatever
+              // height the flex item ends up with
+              <span
+                style={{
+                  position: "absolute",
+                  left: 0,
+                  top: 0,
+                  width: "100%",
+                  height: size * leading,
+                  opacity: o * oOut,
+                }}
+              >
+                {/* anchored to the line, not to the word: hung off `from` the
+                    shape barely finished drawing before the copy left */}
+                {decoration(t, enter + 8, size * leading)}
+              </span>
+            ) : null}
           </span>
         );
       })}
@@ -98,48 +135,39 @@ export const Line = ({
   );
 };
 
-/** Small uppercase monospace-ish label with a leading rule that draws itself. */
+/**
+ * The act's verb. Carries the per-letter kinetic treatment: a different
+ * entrance per act, one shared exit for all four. See letters.tsx.
+ */
 export const Eyebrow = ({
   text,
   t,
+  effect,
   enter = 0,
   exit,
   color = INK_SOFT,
 }: {
   text: string;
   t: number;
+  effect: Enter;
   enter?: number;
   exit?: number;
   color?: string;
 }) => {
   const rule = ease(t, [enter, enter + 30], [0, 46]);
-  const o =
-    ease(t, [enter, enter + 12], [0, 1]) *
-    (exit === undefined ? 1 : ease(t, [exit, exit + 14], [1, 0], IN));
-  const chars = text.split("");
+  const ruleOut =
+    exit === undefined ? 1 : ease(t, [exit, exit + 12], [1, 0], IN);
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 14, opacity: o }}>
-      <div style={{ width: rule, height: 2, background: color }} />
-      <div style={{ display: "flex" }}>
-        {chars.map((c, i) => (
-          <span
-            key={i}
-            style={{
-              fontSize: 15,
-              fontWeight: 700,
-              letterSpacing: "0.22em",
-              color,
-              opacity: ease(
-                t,
-                [enter + 8 + i * 1.6, enter + 20 + i * 1.6],
-                [0, 1],
-              ),
-            }}
-          >
-            {c === " " ? " " : c}
-          </span>
-        ))}
-      </div>
+    <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+      <div style={{ width: rule * ruleOut, height: 2, background: color }} />
+      <KineticText
+        text={text}
+        t={t}
+        start={enter}
+        enter={effect}
+        exit={exit}
+        color={color}
+      />
     </div>
   );
 };

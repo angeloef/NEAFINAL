@@ -6,14 +6,19 @@ import {
 } from "remotion";
 import { loadFont } from "@remotion/google-fonts/PlusJakartaSans";
 import { Eyebrow, Line, ease } from "./analizar/kinetic";
+import type { Enter } from "./analizar/letters";
 import {
-  CompetenciaPanel,
-  DatosPanel,
-  NegocioPanel,
-  WebPanel,
-} from "./analizar/panels";
+  Cells,
+  CompetenciaLabels,
+  DatosLabels,
+  NegocioLabels,
+  WebLabels,
+} from "./analizar/cells";
+import { SHAPES } from "./analizar/shapes";
 import {
   ACTS,
+  AMBER,
+  BLUE,
   COL,
   DURATION,
   FADE,
@@ -27,31 +32,55 @@ import {
 
 const { fontFamily } = loadFont();
 
-const TEXT_OUT = 30; // frames before an act ends that its copy starts leaving
+const TEXT_OUT = 30; // matches the shared moveout exit in letters.tsx
 
-// The four acts are the method, in order: learn the business, study the
-// competition, gather the data, and only then design against the objective.
-const SCRIPT = [
+/**
+ * The card's own heading already says "Analizamos tu negocio". The film does not
+ * repeat it — it conjugates it. The four eyebrows are the four verbs that make
+ * up that "analizamos", and read as one sentence in a row.
+ *
+ * Each act's accent colour is the grammar from theme.ts: vermilion is your
+ * objective, blue is what comes from outside, amber is your own data.
+ */
+const SCRIPT: {
+  eyebrow: string;
+  line: string;
+  effect: Enter;
+  accent: string;
+}[] = [
   {
-    eyebrow: "EMPEZAMOS POR VOS",
-    line: "Qué vendés, a quién y qué querés lograr.",
+    eyebrow: "ESCUCHAMOS",
+    line: "Qué vendés, a quién, y qué querés lograr.",
+    effect: "crossword",
+    accent: VERMILION,
   },
   {
-    eyebrow: "MIRAMOS AFUERA",
-    line: "Contra quién competís de verdad.",
+    eyebrow: "COMPARAMOS",
+    line: "Contra qué te compara tu cliente.",
+    effect: "weaver",
+    accent: BLUE,
   },
   {
-    eyebrow: "JUNTAMOS LOS DATOS",
-    line: "Lo que tu negocio ya sabe, junto.",
+    eyebrow: "MEDIMOS",
+    line: "Lo que tu negocio ya venía diciendo.",
+    effect: "trail",
+    accent: AMBER,
   },
-  { eyebrow: "RECIÉN AHÍ, LA WEB", line: "Cada decisión apunta a ese objetivo." },
+  {
+    eyebrow: "DECIDIMOS",
+    line: "La web es la conclusión, no el punto de partida.",
+    effect: "redraw",
+    accent: VERMILION,
+  },
 ];
 
 // The footage window is one object that travels; it is never cut and re-cut.
+// It may sit above the safe band only on the right half, where the page's
+// black "01 — Analizar" tag is not.
 const RECTS = [
   { x: COL.rightX, y: 42, w: COL.rightW, h: 132 },
   { x: 916, y: 42, w: 292, h: 132 },
-  { x: COL.rightX, y: 42, w: 292, h: 132 }, // slides across so no two acts frame alike
+  { x: COL.rightX, y: 42, w: 292, h: 132 },
   { x: COL.rightX, y: 42, w: COL.rightW, h: 132 },
 ];
 
@@ -75,7 +104,6 @@ const windowRect = (frame: number) => {
 const FootageWindow = ({ frame }: { frame: number }) => {
   const r = windowRect(frame);
   const open = ease(frame, [4, 40], [0, 1]);
-  // slow drift so the frame never feels like a still
   const drift = Math.sin((frame / DURATION) * Math.PI * 2) * 10;
 
   return (
@@ -114,7 +142,6 @@ const FootageWindow = ({ frame }: { frame: number }) => {
           }}
         />
       </div>
-      {/* duotone: paper in the highlights, a touch of vermilion in the shadows */}
       <div
         style={{
           position: "absolute",
@@ -148,7 +175,10 @@ export const Step1Analizar = () => {
   const a = ACTS.reduce((acc, act, i) => (frame >= act.start ? i : acc), 0);
   const t = frame - ACTS[a].start;
   const len = ACTS[a].end - ACTS[a].start;
-  const exitAt = a === ACTS.length - 1 ? undefined : len - TEXT_OUT;
+  const last = a === ACTS.length - 1;
+  const exitAt = last ? undefined : len - TEXT_OUT;
+  const act = SCRIPT[a];
+  const Shape = SHAPES[a];
 
   // bookend dissolve so the <video loop> seam is invisible
   const fade = Math.min(
@@ -159,8 +189,6 @@ export const Step1Analizar = () => {
   return (
     <AbsoluteFill style={{ background: PAPER, fontFamily }}>
       <AbsoluteFill>
-        {/* structure: the rule under the page's own "01 Analizar" tag, and the
-            two column edges everything else aligns to */}
         <div
           style={{
             position: "absolute",
@@ -190,6 +218,7 @@ export const Step1Analizar = () => {
           />
         ))}
       </AbsoluteFill>
+
       <AbsoluteFill style={{ opacity: fade }}>
         <FootageWindow frame={frame} />
 
@@ -203,8 +232,9 @@ export const Step1Analizar = () => {
         >
           <Eyebrow
             key={`e${a}`}
-            text={SCRIPT[a].eyebrow}
+            text={act.eyebrow}
             t={t}
+            effect={act.effect}
             enter={6}
             exit={exitAt}
             color={a === 3 ? VERMILION : INK_SOFT}
@@ -212,35 +242,25 @@ export const Step1Analizar = () => {
           <div style={{ height: 22 }} />
           <Line
             key={`l${a}`}
-            text={SCRIPT[a].line}
+            text={act.line}
             t={t}
             enter={14}
             exit={exitAt}
-            size={44}
+            size={a === 3 ? 40 : 44}
             color={INK}
+            accent={act.accent}
+            decoration={(dt, start, h) => (
+              <Shape t={dt} start={start} h={h} color={act.accent} />
+            )}
           />
         </div>
 
-        <div
-          style={{ position: "absolute", left: COL.rightX + 24, top: COL.top }}
-        >
-          {a === 0 ? <NegocioPanel t={t} w={COL.rightW - 48} /> : null}
-        </div>
-        <div
-          style={{ position: "absolute", left: COL.rightX + 24, top: COL.top }}
-        >
-          {a === 1 ? <CompetenciaPanel t={t} /> : null}
-        </div>
-        <div
-          style={{ position: "absolute", left: COL.rightX + 24, top: COL.top }}
-        >
-          {a === 2 ? <DatosPanel t={t} w={COL.rightW - 48} /> : null}
-        </div>
-        <div
-          style={{ position: "absolute", left: COL.rightX + 24, top: COL.top }}
-        >
-          {a === 3 ? <WebPanel t={t} w={COL.rightW - 48} /> : null}
-        </div>
+        {/* Sixteen cells, never unmounted. Only the labels cross-fade. */}
+        <Cells frame={frame} />
+        {a === 0 ? <NegocioLabels t={t} len={len} /> : null}
+        {a === 1 ? <CompetenciaLabels t={t} len={len} /> : null}
+        {a === 2 ? <DatosLabels t={t} len={len} /> : null}
+        {a === 3 ? <WebLabels t={t} len={len} /> : null}
       </AbsoluteFill>
     </AbsoluteFill>
   );
