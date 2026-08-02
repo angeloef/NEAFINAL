@@ -1540,9 +1540,15 @@ El sistema para que tu negocio">
 
     /* text layer: one absolutely-positioned grid over the media, every line its own element
        so future per-element effects have something to grab */
-    /* index + stage: outside the frame, straight on the black */
-    .hpg__label-top {
-        display: flex; align-items: baseline; gap: clamp(12px, 1.4vw, 20px);
+    /* index + stage: inside the frame now, black on the mockup. The renders keep this
+       corner between 250 and 255 of luminance for their whole run (measured across both
+       videos), so black sits at ~19:1 there — the inverse of the problem the label had when
+       it was white over the same pixels. */
+    .hpg__tag {
+        position: absolute; left: 0; top: 0; z-index: 3;
+        padding: var(--hpg-pad);
+        display: flex; align-items: baseline; gap: clamp(10px, 1vw, 16px);
+        color: #000;
         pointer-events: none;
     }
     /* copy: still inside the frame, where the scrim gives it a floor to stand on */
@@ -1554,21 +1560,52 @@ El sistema para que tu negocio">
     }
 
     .hpg__index {
-        font-size: clamp(2rem, 3.4vw, 3.25rem);
-        line-height: .9;
-        font-style: italic;
-        color: var(--hpg-amber);
+        font-size: clamp(2.1rem, 3.6vw, 3.6rem);
+        line-height: .86;
+        /* 600 is the heaviest real cut of Plus Jakarta Sans loaded on this page — 700 and 800
+           both fall back to it — so the weight is carried by size and tight tracking too */
+        font-weight: 600;
+        letter-spacing: -.045em;
+        color: #000;
         font-variant-numeric: tabular-nums;
     }
     /* the head's old "Analizar → Diseñar → Construir" line, split across the three cards */
     .hpg__stage {
         display: flex; align-items: center; gap: clamp(10px, 1vw, 16px);
-        font-size: clamp(1.25rem, 1.8vw, 1.9rem);
+        font-size: clamp(1.35rem, 2.1vw, 2.35rem);
         line-height: 1;
-        letter-spacing: -.01em;
-        color: var(--hpg-bone);
+        font-weight: 600;
+        letter-spacing: -.035em;
+        color: #000;
     }
-    .hpg__stage::before { content: ""; width: clamp(18px, 2.2vw, 34px); height: 1px; background: currentColor; opacity: .45; }
+    .hpg__stage::before { content: ""; width: clamp(18px, 2.2vw, 34px); height: 2px; background: currentColor; opacity: .85; flex: none; }
+
+    /* ---------- live type ----------
+       Two nested spans per letter so three things can run at once without fighting over the
+       transform: the outer wipes in (clip-path) and carries the inertia (transform), the
+       inner breathes (animation). --vx is the card's own horizontal speed, written once per
+       frame by the gallery loop; the per-letter factor makes the tail lag behind the head,
+       which is what reads as weight rather than as a slide. */
+    .hpg__stage .ltr {
+        display: inline-block;
+        clip-path: inset(0 0 110% 0);
+        opacity: 0;
+        transform: translateX(calc(var(--vx, 0) * (1 + var(--i) * .14) * -.32px))
+                   skewX(calc(var(--vx, 0) * -.1deg));
+        transition: clip-path .52s cubic-bezier(.16, 1, .3, 1), opacity .34s linear;
+        transition-delay: calc(var(--i) * 32ms);
+        will-change: transform, clip-path;
+    }
+    .hpg__card.is-active .hpg__stage .ltr { clip-path: inset(0 0 0 0); opacity: 1; }
+    .hpg__stage .ltr > span {
+        display: inline-block;
+        animation: hpg-breathe 3.8s ease-in-out infinite;
+        animation-delay: calc(var(--i) * -170ms);
+    }
+    @keyframes hpg-breathe {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-2px); }
+    }
 
     .hpg__name {
         margin: 0 0 10px;
@@ -1588,13 +1625,13 @@ El sistema para que tu negocio">
     .hpg__rule { width: 100%; height: 1px; margin: 0 0 clamp(14px, 1.8vh, 22px); background: var(--hpg-line); transform-origin: left; }
 
     /* card focus state: the panel nearest the centre of the viewport carries the copy */
-    .hpg__label-top > *, .hpg__label-bottom > *, .hpg__rule {
+    .hpg__tag > .hpg__index, .hpg__label-bottom > *, .hpg__rule {
         opacity: 0;
         transform: translateY(14px);
         transition: opacity .6s cubic-bezier(.16, 1, .3, 1), transform .6s cubic-bezier(.16, 1, .3, 1);
         transition-delay: calc(var(--i, 0) * 70ms);
     }
-    .hpg__card.is-active .hpg__label-top > *,
+    .hpg__card.is-active .hpg__tag > .hpg__index,
     .hpg__card.is-active .hpg__label-bottom > *,
     .hpg__card.is-active .hpg__rule { opacity: 1; transform: none; }
     .hpg__card .hpg__scrim { opacity: .55; transition: opacity .6s ease; }
@@ -1634,9 +1671,10 @@ El sistema para que tu negocio">
     .hpg:not(.is-gl) .hpg__card { width: min(100%, 720px); max-width: 100%; }
     .hpg:not(.is-gl) .hpg__media { height: auto; aspect-ratio: 8 / 5; }
     .hpg:not(.is-gl) .hpg__meta { display: none; }
-    .hpg:not(.is-gl) .hpg__label-top > *,
+    .hpg:not(.is-gl) .hpg__tag > *,
     .hpg:not(.is-gl) .hpg__label-bottom > *,
     .hpg:not(.is-gl) .hpg__rule { opacity: 1; transform: none; }
+    .hpg:not(.is-gl) .hpg__stage .ltr { clip-path: none; opacity: 1; transform: none; }
 
     @media (max-width: 991px) {
         .hpg__head { min-height: 0; padding-top: clamp(64px, 10vh, 110px); }
@@ -1644,7 +1682,9 @@ El sistema para que tu negocio">
 
     @media (prefers-reduced-motion: reduce) {
         .hpg__hint span { animation: none; }
-        .hpg__label-top > *, .hpg__label-bottom > *, .hpg__rule { transition: none; }
+        .hpg__tag > *, .hpg__label-bottom > *, .hpg__rule { transition: none; }
+        .hpg__stage .ltr { transition: none; clip-path: none; opacity: 1; transform: none; }
+        .hpg__stage .ltr > span { animation: none; }
     }
     .reduced-motion .hpg__hint span { animation: none; }
 </style>
@@ -1669,10 +1709,6 @@ El sistema para que tu negocio">
             <div class="js-hpg-track hpg__track">
 
                 <article class="js-hpg-card hpg__card" aria-label="Paso 1: Analizamos tu negocio">
-                        <div class="hpg__label-top">
-                        <span class="hpg__index" style="--i:0" aria-hidden="true">01</span>
-                        <span class="hpg__stage" style="--i:1">Analizar</span>
-                    </div>
                     <div class="hpg__media">
                     <!-- render de storefront-animations/src/Step1Diagnosis.tsx -->
                     <video class="js-hpg-img hpg__img" poster="assets/storefront-layout-poster.webp"
@@ -1682,6 +1718,10 @@ El sistema para que tu negocio">
                         <source src="assets/storefront-layout.mp4" type="video/mp4" />
                     </video>
                     <div class="hpg__scrim" aria-hidden="true"></div>
+                        <div class="hpg__tag">
+                        <span class="hpg__index" style="--i:0" aria-hidden="true">01</span>
+                        <span class="hpg__stage" style="--i:1">Analizar</span>
+                    </div>
                         <div class="hpg__label-bottom">
                         <i class="hpg__rule" style="--i:2" aria-hidden="true"></i>
                         <h3 class="hpg__name" style="--i:3">Analizamos tu negocio</h3>
@@ -1691,10 +1731,6 @@ El sistema para que tu negocio">
                 </article>
 
                 <article class="js-hpg-card hpg__card" aria-label="Paso 2: Te mostramos el camino a seguir">
-                        <div class="hpg__label-top">
-                        <span class="hpg__index" style="--i:0" aria-hidden="true">02</span>
-                        <span class="hpg__stage" style="--i:1">Diseñar</span>
-                    </div>
                     <div class="hpg__media">
                     <!-- render de storefront-animations/src/Step2Roadmap.tsx -->
                     <video class="js-hpg-img hpg__img" poster="assets/storefront-section-latam-poster.webp"
@@ -1704,6 +1740,10 @@ El sistema para que tu negocio">
                         <source src="assets/storefront-section-latam.mp4" type="video/mp4" />
                     </video>
                     <div class="hpg__scrim" aria-hidden="true"></div>
+                        <div class="hpg__tag">
+                        <span class="hpg__index" style="--i:0" aria-hidden="true">02</span>
+                        <span class="hpg__stage" style="--i:1">Diseñar</span>
+                    </div>
                         <div class="hpg__label-bottom">
                         <i class="hpg__rule" style="--i:2" aria-hidden="true"></i>
                         <h3 class="hpg__name" style="--i:3">Te mostramos el camino a seguir</h3>
@@ -1713,14 +1753,14 @@ El sistema para que tu negocio">
                 </article>
 
                 <article class="js-hpg-card hpg__card" aria-label="Paso 3: Construimos y medimos">
-                        <div class="hpg__label-top">
-                        <span class="hpg__index" style="--i:0" aria-hidden="true">03</span>
-                        <span class="hpg__stage" style="--i:1">Construir</span>
-                    </div>
                     <div class="hpg__media">
                     <!-- TODO: reemplazar por el asset final de la etapa 3 -->
                     <img class="js-hpg-img hpg__img" src="assets/09.28544ed6.webp" alt="" draggable="false" width="1600" height="1200" />
                     <div class="hpg__scrim" aria-hidden="true"></div>
+                        <div class="hpg__tag">
+                        <span class="hpg__index" style="--i:0" aria-hidden="true">03</span>
+                        <span class="hpg__stage" style="--i:1">Construir</span>
+                    </div>
                         <div class="hpg__label-bottom">
                         <i class="hpg__rule" style="--i:2" aria-hidden="true"></i>
                         <h3 class="hpg__name" style="--i:3">Construimos y medimos</h3>
@@ -2301,6 +2341,29 @@ function init(section) {
     const reduceMotion = document.documentElement.classList.contains('reduced-motion') ||
         window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+    /* Split each stage word into per-letter spans (outer wipes and leans, inner breathes).
+       Done here rather than in the markup so content.json keeps matching plain text, and
+       skipped entirely under reduced-motion, where the CSS leaves the word alone. */
+    if (!reduceMotion) {
+        cards.forEach((c) => {
+            const stage = c.querySelector('.hpg__stage');
+            if (!stage) return;
+            const word = stage.textContent.trim();
+            stage.setAttribute('aria-label', word);
+            stage.textContent = '';
+            word.split('').forEach((ch, i) => {
+                const outer = document.createElement('span');
+                outer.className = 'ltr';
+                outer.style.setProperty('--i', i);
+                outer.setAttribute('aria-hidden', 'true');
+                const inner = document.createElement('span');
+                inner.textContent = ch;
+                outer.appendChild(inner);
+                stage.appendChild(outer);
+            });
+        });
+    }
+
     /* Only the parked stage plays. Two decoders running behind a section nobody is looking at
        is a battery bill for nothing, and browsers do not reliably suspend offscreen video on
        their own. Under reduced-motion none of them start — preload="auto" still leaves a
@@ -2422,6 +2485,14 @@ function init(section) {
                 x = ((x - minX) % strip + strip) % strip + minX;
             }
             m.card.style.transform = `translate3d(${(x - m.left).toFixed(2)}px,0,0)`;
+            /* The card's own speed, smoothed and clamped, published for the letter spans to
+               lean on. Recycling teleports a card a whole strip away, so anything that big is
+               a jump rather than motion and must not reach the type. */
+            const raw = m.prevX === undefined ? 0 : x - m.prevX;
+            m.prevX = x;
+            const step = Math.abs(raw) > vw ? 0 : raw;
+            m.vx = (m.vx || 0) + (step - (m.vx || 0)) * .25;
+            m.card.style.setProperty('--vx', clamp(-60, 60, m.vx).toFixed(2));
             const center = x + m.w / 2;
             // the mesh still maps css x onto a camera centred on the viewport; only the
             // reference the distortion and the active pick are measured from moved left
