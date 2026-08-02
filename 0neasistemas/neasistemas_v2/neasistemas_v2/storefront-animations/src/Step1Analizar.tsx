@@ -1,7 +1,17 @@
-import { AbsoluteFill, OffthreadVideo, staticFile, useCurrentFrame } from "remotion";
+import {
+  AbsoluteFill,
+  OffthreadVideo,
+  staticFile,
+  useCurrentFrame,
+} from "remotion";
 import { loadFont } from "@remotion/google-fonts/PlusJakartaSans";
 import { Eyebrow, Line, ease } from "./analizar/kinetic";
-import { EntenderPanel, MedirPanel, PriorizarPanel } from "./analizar/panels";
+import {
+  CausaPanel,
+  DecisionPanel,
+  EvidenciaPanel,
+  SintomaPanel,
+} from "./analizar/panels";
 import {
   ACTS,
   COL,
@@ -20,17 +30,17 @@ const { fontFamily } = loadFont();
 const TEXT_OUT = 30; // frames before an act ends that its copy starts leaving
 
 const SCRIPT = [
-  { eyebrow: "OBSERVAR", line: "Miramos tu negocio como lo mira tu cliente." },
-  { eyebrow: "MEDIR", line: "De dónde viene realmente cada venta." },
-  { eyebrow: "ENTENDER", line: "El patrón que se repite cada semana." },
-  { eyebrow: "PRIORIZAR", line: "Qué conviene resolver primero." },
-];
+  { eyebrow: "SÍNTOMA", line: "Meses buenos, meses malos. Nadie sabe por qué." },
+  { eyebrow: "EVIDENCIA", line: "No vendés lo que más promocionás." },
+  { eyebrow: "CAUSA", line: "Llegan el martes. Contestás el jueves." },
+  { eyebrow: "DECISIÓN", line: "Empezamos por lo que te cuesta plata hoy." },
+]
 
 // The footage window is one object that travels; it is never cut and re-cut.
 const RECTS = [
-  { x: COL.rightX, y: 42, w: COL.rightW, h: 363 },
-  { x: 916, y: 42, w: 292, h: 146 },
-  { x: 916, y: 42, w: 292, h: 146 },
+  { x: COL.rightX, y: 42, w: COL.rightW, h: 132 },
+  { x: 916, y: 42, w: 292, h: 132 },
+  { x: 916, y: 42, w: 292, h: 132 },
   { x: COL.rightX, y: 42, w: COL.rightW, h: 132 },
 ];
 
@@ -94,7 +104,14 @@ const FootageWindow = ({ frame }: { frame: number }) => {
         />
       </div>
       {/* duotone: paper in the highlights, a touch of vermilion in the shadows */}
-      <div style={{ position: "absolute", inset: 0, background: PAPER, opacity: 0.14 }} />
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          background: PAPER,
+          opacity: 0.14,
+        }}
+      />
       <div
         style={{
           position: "absolute",
@@ -104,11 +121,16 @@ const FootageWindow = ({ frame }: { frame: number }) => {
           mixBlendMode: "multiply",
         }}
       />
-      <div style={{ position: "absolute", inset: 0, border: `1px solid ${HAIRLINE}` }} />
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          border: `1px solid ${HAIRLINE}`,
+        }}
+      />
     </div>
   );
 };
-
 
 export const Step1Analizar = () => {
   const frame = useCurrentFrame();
@@ -128,8 +150,22 @@ export const Step1Analizar = () => {
       <AbsoluteFill>
         {/* structure: the rule under the page's own "01 Analizar" tag, and the
             two column edges everything else aligns to */}
-        <div style={{ position: "absolute", left: 0, top: 200, width: W, height: 1, background: HAIRLINE }} />
-        {[COL.leftX, COL.leftX + COL.leftW, COL.rightX, COL.rightX + COL.rightW].map((x) => (
+        <div
+          style={{
+            position: "absolute",
+            left: 0,
+            top: 200,
+            width: W,
+            height: 1,
+            background: HAIRLINE,
+          }}
+        />
+        {[
+          COL.leftX,
+          COL.leftX + COL.leftW,
+          COL.rightX,
+          COL.rightX + COL.rightW,
+        ].map((x) => (
           <div
             key={x}
             style={{
@@ -142,7 +178,6 @@ export const Step1Analizar = () => {
             }}
           />
         ))}
-
       </AbsoluteFill>
       <AbsoluteFill style={{ opacity: fade }}>
         <FootageWindow frame={frame} />
@@ -175,17 +210,18 @@ export const Step1Analizar = () => {
           />
         </div>
 
-        <div style={{ position: "absolute", left: COL.rightX, top: COL.top }}>
-          {a === 1 ? <MedirPanel t={t} w={COL.rightW} /> : null}
+        <div style={{ position: "absolute", left: COL.rightX + 24, top: COL.top }}>
+          {a === 0 ? <SintomaPanel t={t} /> : null}
         </div>
-        <div style={{ position: "absolute", left: COL.rightX, top: COL.top }}>
-          {a === 2 ? <EntenderPanel t={t} /> : null}
+        <div style={{ position: "absolute", left: COL.rightX + 24, top: COL.top }}>
+          {a === 1 ? <EvidenciaPanel t={t} w={COL.rightW - 48} /> : null}
         </div>
-        <div style={{ position: "absolute", left: COL.rightX, top: COL.top }}>
-          {a === 3 ? <PriorizarPanel t={t} w={COL.rightW} /> : null}
+        <div style={{ position: "absolute", left: COL.rightX + 24, top: COL.top }}>
+          {a === 2 ? <CausaPanel t={t} /> : null}
         </div>
-
-
+        <div style={{ position: "absolute", left: COL.rightX + 24, top: COL.top }}>
+          {a === 3 ? <DecisionPanel t={t} w={COL.rightW - 48} /> : null}
+        </div>
       </AbsoluteFill>
     </AbsoluteFill>
   );
