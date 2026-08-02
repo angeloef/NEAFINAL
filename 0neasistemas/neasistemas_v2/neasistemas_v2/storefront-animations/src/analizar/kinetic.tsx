@@ -61,13 +61,21 @@ export const Line = ({
         const y = ease(t, [from, from + 26], [110, 0]);
         const o = ease(t, [from, from + 14], [0, 1]);
         const xOut =
-          exit === undefined ? 0 : ease(t, [exit + i * 2, exit + 22], [0, -60], IN);
+          exit === undefined
+            ? 0
+            : ease(t, [exit + i * 2, exit + 22], [0, -60], IN);
         const oOut =
-          exit === undefined ? 1 : ease(t, [exit + i * 2, exit + 20], [1, 0], IN);
+          exit === undefined
+            ? 1
+            : ease(t, [exit + i * 2, exit + 20], [1, 0], IN);
         return (
           <span
             key={i}
-            style={{ display: "block", overflow: "hidden", paddingBottom: size * 0.1 }}
+            style={{
+              display: "block",
+              overflow: "hidden",
+              paddingBottom: size * 0.1,
+            }}
           >
             <span
               style={{
@@ -121,7 +129,11 @@ export const Eyebrow = ({
               fontWeight: 700,
               letterSpacing: "0.22em",
               color,
-              opacity: ease(t, [enter + 8 + i * 1.6, enter + 20 + i * 1.6], [0, 1]),
+              opacity: ease(
+                t,
+                [enter + 8 + i * 1.6, enter + 20 + i * 1.6],
+                [0, 1],
+              ),
             }}
           >
             {c === " " ? " " : c}

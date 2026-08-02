@@ -1,101 +1,211 @@
 import { Counter, ease } from "./kinetic";
-import { AMBER, BLUE, HAIRLINE, INK, INK_SOFT, VERMILION } from "./theme";
+import { AMBER, HAIRLINE, INK, INK_SOFT, VERMILION } from "./theme";
 
-const label: React.CSSProperties = {
-  fontSize: 16,
+// Every figure here is illustrative: this is a product mock, not a client
+// report, so nothing is framed as something our clients actually did.
+
+const caption: React.CSSProperties = {
+  fontSize: 13,
   fontWeight: 600,
   color: INK_SOFT,
-  letterSpacing: "-0.01em",
+  letterSpacing: "0.02em",
 };
 
-/* ── MEDIR ────────────────────────────────────────────────────────────────
-   Where the sales actually come from. Bars grow from a shared baseline with
-   a per-row delay, and the figure counts with the bar so the eye can follow
-   one object instead of two.                                              */
+/* ── SÍNTOMA ──────────────────────────────────────────────────────────────
+   Same work every month, wildly different result. One flat dashed line over
+   a ragged bar chart says it faster than any sentence could.              */
 
-const CHANNELS = [
-  { name: "Referidos", value: 38, color: INK },
-  { name: "Instagram", value: 27, color: BLUE },
-  { name: "WhatsApp", value: 21, color: AMBER },
-  { name: "Google", value: 14, color: INK_SOFT },
-];
-const BAR_MAX = 40;
+const MONTHS = ["E", "F", "M", "A", "M", "J", "J", "A"];
+const SALES = [52, 88, 41, 63, 35, 79, 44, 58];
+const S_W = 32;
+const S_GAP = 26;
+const S_H = 104;
+const EFFORT = 62; // the flat line: effort never changes
 
-export const MedirPanel = ({ t, w }: { t: number; w: number }) => (
-  <div style={{ width: w, display: "flex", flexDirection: "column", gap: 16 }}>
-    {CHANNELS.map((c, i) => {
-      const start = 8 + i * 7;
-      const grow = ease(t, [start, start + 40], [0, c.value / BAR_MAX]);
-      return (
-        <div key={c.name} style={{ display: "flex", flexDirection: "column", gap: 7 }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-            <span style={{ ...label, opacity: ease(t, [start, start + 12], [0, 1]) }}>
-              {c.name}
-            </span>
-            <Counter
-              t={t}
-              from={0}
-              to={c.value}
-              start={start}
-              duration={40}
-              suffix="%"
-              style={{
-                fontSize: 22,
-                fontWeight: 700,
-                color: INK,
-                letterSpacing: "-0.03em",
-                opacity: ease(t, [start, start + 12], [0, 1]),
-              }}
-            />
+export const SintomaPanel = ({ t }: { t: number }) => {
+  const lineIn = ease(t, [26, 56], [0, 1]);
+  return (
+    <div style={{ position: "relative", width: (S_W + S_GAP) * MONTHS.length }}>
+      <div
+        style={{
+          position: "relative",
+          height: S_H,
+          display: "flex",
+          gap: S_GAP,
+          alignItems: "flex-end",
+        }}
+      >
+        {SALES.map((v, i) => {
+          const h = ease(t, [4 + i * 4, 34 + i * 4], [0, (v / 100) * S_H]);
+          return (
+            <div key={i} style={{ width: S_W, height: h, background: INK }} />
+          );
+        })}
+        <div
+          style={{
+            position: "absolute",
+            left: 0,
+            bottom: (EFFORT / 100) * S_H,
+            width: `${lineIn * 100}%`,
+            borderTop: `2px dashed ${VERMILION}`,
+          }}
+        />
+      </div>
+      <div style={{ display: "flex", gap: S_GAP, marginTop: 8 }}>
+        {MONTHS.map((m, i) => (
+          <div
+            key={i}
+            style={{
+              ...caption,
+              width: S_W,
+              textAlign: "center",
+              opacity: ease(t, [8 + i * 4, 20 + i * 4], [0, 1]),
+            }}
+          >
+            {m}
           </div>
-          <div style={{ height: 6, background: HAIRLINE, position: "relative" }}>
-            <div
-              style={{
-                position: "absolute",
-                inset: 0,
-                width: `${grow * 100}%`,
-                background: c.color,
-              }}
-            />
-          </div>
+        ))}
+      </div>
+      <div
+        style={{
+          display: "flex",
+          gap: 22,
+          marginTop: 16,
+          opacity: ease(t, [50, 66], [0, 1]),
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <div style={{ width: 16, height: 7, background: INK }} />
+          <span style={caption}>lo que vendiste</span>
         </div>
-      );
-    })}
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <div style={{ width: 16, borderTop: `2px dashed ${VERMILION}` }} />
+          <span style={{ ...caption, color: VERMILION }}>
+            el trabajo que pusiste
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* ── EVIDENCIA ────────────────────────────────────────────────────────────
+   What you push vs what actually sells, on a shared scale so the inversion
+   is impossible to miss. The row that contradicts you gets the accent.    */
+
+const ITEMS = [
+  { name: "El combo que armaste", push: 0.88, sells: 0.31 },
+  { name: "La promo del mes", push: 0.72, sells: 0.24 },
+  { name: "Retirar en el local", push: 0.14, sells: 0.91, star: true },
+];
+
+const Bar = ({
+  p,
+  color,
+  delay,
+  t,
+}: {
+  p: number;
+  color: string;
+  delay: number;
+  t: number;
+}) => (
+  <div style={{ height: 7, background: HAIRLINE, position: "relative" }}>
+    <div
+      style={{
+        position: "absolute",
+        inset: 0,
+        width: `${ease(t, [delay, delay + 34], [0, p]) * 100}%`,
+        background: color,
+      }}
+    />
   </div>
 );
 
-/* ── ENTENDER ─────────────────────────────────────────────────────────────
-   The repeating pattern. The line draws left to right, then one point is
-   promoted with a leader line and a plain-language annotation.            */
+export const EvidenciaPanel = ({ t, w }: { t: number; w: number }) => (
+  <div style={{ width: w }}>
+    <div
+      style={{
+        display: "flex",
+        gap: 22,
+        marginBottom: 15,
+        opacity: ease(t, [2, 16], [0, 1]),
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+        <div style={{ width: 16, height: 7, background: AMBER }} />
+        <span style={caption}>lo que promocionás</span>
+      </div>
+      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+        <div style={{ width: 16, height: 7, background: INK }} />
+        <span style={caption}>lo que te compran</span>
+      </div>
+    </div>
+    <div style={{ display: "flex", flexDirection: "column", gap: 15 }}>
+      {ITEMS.map((it, i) => {
+        const d = 10 + i * 8;
+        return (
+          <div
+            key={it.name}
+            style={{ display: "flex", flexDirection: "column", gap: 5 }}
+          >
+            <div
+              style={{
+                fontSize: 15,
+                fontWeight: it.star ? 700 : 600,
+                color: it.star ? VERMILION : INK_SOFT,
+                letterSpacing: "-0.01em",
+                opacity: ease(t, [d, d + 12], [0, 1]),
+              }}
+            >
+              {it.name}
+            </div>
+            <Bar t={t} p={it.push} color={AMBER} delay={d} />
+            <Bar
+              t={t}
+              p={it.sells}
+              color={it.star ? VERMILION : INK}
+              delay={d + 6}
+            />
+          </div>
+        );
+      })}
+    </div>
+  </div>
+);
 
-const SERIES = [34, 41, 88, 46, 39, 72, 30];
+/* ── CAUSA ────────────────────────────────────────────────────────────────
+   The gap between when the question arrives and when it gets answered. The
+   bracket is the whole point of the panel.                                */
+
+const WEEK = [30, 92, 54, 44, 61, 36, 22];
 const DAYS = ["L", "M", "M", "J", "V", "S", "D"];
-const PEAK = 2;
-const CH_W = 290;
-const CH_H = 132;
-const CALLOUT_X = CH_W + 54;
+const IN_DAY = 1; // martes: the consultas land
+const OUT_DAY = 3; // jueves: when they get answered
+const C_W = 344;
+const C_H = 106;
 
-export const EntenderPanel = ({ t }: { t: number }) => {
-  const max = 100;
-  const pts = SERIES.map((v, i) => ({
-    x: (i / (SERIES.length - 1)) * CH_W,
-    y: CH_H - (v / max) * CH_H,
+export const CausaPanel = ({ t }: { t: number }) => {
+  const pts = WEEK.map((v, i) => ({
+    x: (i / (WEEK.length - 1)) * C_W,
+    y: C_H - (v / 100) * C_H,
   }));
-  const draw = ease(t, [6, 48], [0, 1]);
-  const peak = pts[PEAK];
-  const markIn = ease(t, [44, 62], [0, 1]);
-  const leader = ease(t, [52, 74], [0, 1]);
+  const draw = ease(t, [4, 44], [0, 1]);
+  const a = pts[IN_DAY];
+  const b = pts[OUT_DAY];
+  const br = ease(t, [34, 56], [0, 1]);
+  const top = -30;
 
   return (
-    <div style={{ position: "relative", width: CH_W + 230, height: CH_H + 60 }}>
-      <svg width={CH_W + 230} height={CH_H + 40} style={{ overflow: "visible" }}>
+    <div style={{ position: "relative", width: C_W + 140, paddingTop: 40 }}>
+      <svg width={C_W + 140} height={C_H + 32} style={{ overflow: "visible" }}>
         {[0, 0.5, 1].map((f) => (
           <line
             key={f}
             x1={0}
-            x2={CH_W}
-            y1={CH_H * f}
-            y2={CH_H * f}
+            x2={C_W}
+            y1={C_H * f}
+            y2={C_H * f}
             stroke={HAIRLINE}
             strokeWidth={1}
           />
@@ -111,108 +221,153 @@ export const EntenderPanel = ({ t }: { t: number }) => {
           strokeDasharray={1}
           strokeDashoffset={1 - draw}
         />
-        {pts.map((p, i) => (
-          <circle
-            key={i}
-            cx={p.x}
-            cy={p.y}
-            r={i === PEAK ? 5.5 : 3}
-            fill={i === PEAK ? VERMILION : "#fff"}
-            stroke={i === PEAK ? VERMILION : INK}
-            strokeWidth={2}
-            opacity={ease(t, [10 + i * 6, 22 + i * 6], [0, 1])}
-          />
-        ))}
+        {pts.map((p, i) => {
+          const key = i === IN_DAY || i === OUT_DAY;
+          return (
+            <circle
+              key={i}
+              cx={p.x}
+              cy={p.y}
+              r={key ? 5.5 : 3}
+              fill={i === IN_DAY ? VERMILION : "#fff"}
+              stroke={key ? VERMILION : INK}
+              strokeWidth={2}
+              opacity={ease(t, [8 + i * 5, 20 + i * 5], [0, 1])}
+            />
+          );
+        })}
         {pts.map((p, i) => (
           <text
             key={`d${i}`}
             x={p.x}
-            y={CH_H + 26}
+            y={C_H + 25}
             textAnchor="middle"
             fontSize={13}
-            fontWeight={600}
-            fill={i === PEAK ? VERMILION : INK_SOFT}
-            opacity={ease(t, [12 + i * 5, 24 + i * 5], [0, 1])}
+            fontWeight={i === IN_DAY || i === OUT_DAY ? 700 : 600}
+            fill={i === IN_DAY || i === OUT_DAY ? VERMILION : INK_SOFT}
+            opacity={ease(t, [10 + i * 5, 22 + i * 5], [0, 1])}
           >
             {DAYS[i]}
           </text>
         ))}
-        {/* leader runs right from the peak, above every other point */}
+        {/* the wait itself, drawn as a bracket spanning the two days */}
         <path
-          d={`M ${peak.x + 10} ${peak.y} L ${peak.x + 10 + (CALLOUT_X - peak.x - 18) * leader} ${peak.y}`}
+          d={`M ${a.x} ${a.y - 14} L ${a.x} ${top} L ${a.x + (b.x - a.x) * br} ${top}`}
           fill="none"
           stroke={VERMILION}
           strokeWidth={1.5}
-          opacity={leader}
+          opacity={br}
         />
-        <circle
-          cx={peak.x}
-          cy={peak.y}
-          r={6 + 16 * markIn}
+        <path
+          d={`M ${b.x} ${top} L ${b.x} ${b.y - 14}`}
           fill="none"
           stroke={VERMILION}
           strokeWidth={1.5}
-          opacity={1 - markIn}
+          opacity={ease(t, [56, 66], [0, 1])}
         />
       </svg>
 
       <div
         style={{
           position: "absolute",
-          left: CALLOUT_X,
-          top: peak.y - 14,
-          width: 176,
-          opacity: ease(t, [68, 84], [0, 1]),
-          translate: `${ease(t, [68, 84], [-10, 0])}px 0`,
+          left: b.x + 40,
+          top: 6,
+          width: 150,
+          opacity: ease(t, [60, 76], [0, 1]),
+          translate: `${ease(t, [60, 76], [-8, 0])}px 0`,
         }}
       >
-        <div style={{ fontSize: 30, fontWeight: 800, color: VERMILION, letterSpacing: "-0.04em", lineHeight: 1 }}>
-          <Counter t={t} from={0} to={34} start={68} duration={32} suffix="%" />
+        <div
+          style={{
+            fontSize: 32,
+            fontWeight: 800,
+            color: VERMILION,
+            letterSpacing: "-0.04em",
+            lineHeight: 1,
+          }}
+        >
+          <Counter t={t} from={0} to={48} start={60} duration={28} suffix=" h" />
         </div>
-        <div style={{ fontSize: 15, fontWeight: 600, color: INK_SOFT, lineHeight: 1.34, marginTop: 6 }}>
-          de las consultas caen siempre el mismo día
+        <div style={{ ...caption, marginTop: 5, lineHeight: 1.35 }}>
+          esperando una respuesta
         </div>
       </div>
     </div>
   );
 };
 
-/* ── PRIORIZAR ────────────────────────────────────────────────────────────
-   The output of the whole step: an ordered list. Rank 01 is the only thing
-   with a fill, because the point of the step is that one thing goes first. */
+/* ── DECISIÓN ─────────────────────────────────────────────────────────────
+   One ordered list. Only the first item is filled, because the output of a
+   diagnosis is knowing what goes first, not a list of everything.         */
 
 const FINDINGS = [
-  { n: "01", text: "Responder más rápido la primera consulta", tag: "impacto alto" },
-  { n: "02", text: "Mostrar precios sin que tengan que preguntar", tag: "impacto medio" },
-  { n: "03", text: "Recuperar al cliente que ya compró", tag: "a mediano plazo" },
+  { n: "01", text: "Contestar el martes, no el jueves", cost: 3 },
+  { n: "02", text: "Poner adelante lo que ya se vende solo", cost: 2 },
+  { n: "03", text: "Volver a los que ya te compraron", cost: 1 },
 ];
 
-export const PriorizarPanel = ({ t, w }: { t: number; w: number }) => (
+const CostMeter = ({
+  level,
+  lead,
+  t,
+  start,
+}: {
+  level: number;
+  lead: boolean;
+  t: number;
+  start: number;
+}) => (
+  <div style={{ display: "flex", gap: 3, alignItems: "flex-end", height: 16 }}>
+    {[0, 1, 2].map((i) => (
+      <div
+        key={i}
+        style={{
+          width: 5,
+          height: 6 + i * 5,
+          background:
+            i < level
+              ? lead
+                ? "#fff"
+                : INK_SOFT
+              : lead
+                ? "rgba(255,255,255,.32)"
+                : HAIRLINE,
+          opacity: ease(t, [start + 10 + i * 4, start + 20 + i * 4], [0, 1]),
+        }}
+      />
+    ))}
+  </div>
+);
+
+export const DecisionPanel = ({ t, w }: { t: number; w: number }) => (
   <div style={{ width: w, display: "flex", flexDirection: "column", gap: 9 }}>
+    <div style={{ ...caption, opacity: ease(t, [2, 16], [0, 1]) }}>
+      ordenado por lo que te está costando hoy
+    </div>
     {FINDINGS.map((f, i) => {
-      const start = 6 + i * 12;
-      const o = ease(t, [start, start + 18], [0, 1]);
-      const x = ease(t, [start, start + 26], [26, 0]);
+      const start = 8 + i * 12;
       const lead = i === 0;
-      const pulse = lead ? 1 + 0.012 * Math.sin(((t - start) / 30) * Math.PI * 2) : 1;
+      const pulse = lead
+        ? 1 + 0.012 * Math.sin(((t - start) / 30) * Math.PI * 2)
+        : 1;
       return (
         <div
           key={f.n}
           style={{
             display: "flex",
             alignItems: "center",
-            gap: 18,
-            padding: "10px 18px",
+            gap: 16,
+            padding: "11px 18px",
             background: lead ? VERMILION : "transparent",
             border: `1.5px solid ${lead ? VERMILION : HAIRLINE}`,
-            opacity: o,
-            translate: `${x}px 0`,
+            opacity: ease(t, [start, start + 18], [0, 1]),
+            translate: `${ease(t, [start, start + 26], [26, 0])}px 0`,
             scale: pulse,
           }}
         >
           <span
             style={{
-              fontSize: 21,
+              fontSize: 20,
               fontWeight: 800,
               letterSpacing: "-0.04em",
               color: lead ? "#fff" : INK_SOFT,
@@ -221,29 +376,19 @@ export const PriorizarPanel = ({ t, w }: { t: number; w: number }) => (
           >
             {f.n}
           </span>
-          <div style={{ flex: 1 }}>
-            <div
-              style={{
-                fontSize: 16,
-                fontWeight: 700,
-                letterSpacing: "-0.02em",
-                color: lead ? "#fff" : INK,
-                lineHeight: 1.25,
-              }}
-            >
-              {f.text}
-            </div>
-            <div
-              style={{
-                fontSize: 12.5,
-                fontWeight: 600,
-                marginTop: 1,
-                color: lead ? "rgba(255,255,255,0.78)" : INK_SOFT,
-              }}
-            >
-              {f.tag}
-            </div>
+          <div
+            style={{
+              flex: 1,
+              fontSize: 16,
+              fontWeight: 700,
+              letterSpacing: "-0.02em",
+              color: lead ? "#fff" : INK,
+              lineHeight: 1.25,
+            }}
+          >
+            {f.text}
           </div>
+          <CostMeter level={f.cost} lead={lead} t={t} start={start} />
         </div>
       );
     })}
