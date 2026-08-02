@@ -30,17 +30,17 @@ const { fontFamily } = loadFont();
 const TEXT_OUT = 30; // frames before an act ends that its copy starts leaving
 
 const SCRIPT = [
-  { eyebrow: "SÍNTOMA", line: "Meses buenos, meses malos. Nadie sabe por qué." },
-  { eyebrow: "EVIDENCIA", line: "No vendés lo que más promocionás." },
-  { eyebrow: "CAUSA", line: "Llegan el martes. Contestás el jueves." },
-  { eyebrow: "DECISIÓN", line: "Empezamos por lo que te cuesta plata hoy." },
-]
+  { eyebrow: "LO QUE MIRAMOS", line: "Ocho meses de ventas antes de tocar nada." },
+  { eyebrow: "LO QUE ENCONTRAMOS", line: "Que no vendés lo que más promocionás." },
+  { eyebrow: "LO QUE TE MOSTRAMOS", line: "Dónde se te está cayendo la venta." },
+  { eyebrow: "CON QUÉ SALÍS", line: "Tres prioridades y un orden." },
+];
 
 // The footage window is one object that travels; it is never cut and re-cut.
 const RECTS = [
   { x: COL.rightX, y: 42, w: COL.rightW, h: 132 },
   { x: 916, y: 42, w: 292, h: 132 },
-  { x: 916, y: 42, w: 292, h: 132 },
+  { x: COL.rightX, y: 42, w: 292, h: 132 }, // slides across so no two acts frame alike
   { x: COL.rightX, y: 42, w: COL.rightW, h: 132 },
 ];
 

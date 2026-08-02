@@ -286,7 +286,14 @@ export const CausaPanel = ({ t }: { t: number }) => {
             lineHeight: 1,
           }}
         >
-          <Counter t={t} from={0} to={48} start={60} duration={28} suffix=" h" />
+          <Counter
+            t={t}
+            from={0}
+            to={48}
+            start={60}
+            duration={28}
+            suffix=" h"
+          />
         </div>
         <div style={{ ...caption, marginTop: 5, lineHeight: 1.35 }}>
           esperando una respuesta
