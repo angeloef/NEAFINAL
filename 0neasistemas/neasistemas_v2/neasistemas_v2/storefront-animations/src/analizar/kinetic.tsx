@@ -32,7 +32,7 @@ export const Line = ({
   color = INK,
   tracking = -0.03,
   leading = 1.06,
-  stagger = 4,
+  stagger = 3,
   accent,
   decoration,
   style,

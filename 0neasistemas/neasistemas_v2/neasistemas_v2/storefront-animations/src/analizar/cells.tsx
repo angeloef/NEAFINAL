@@ -417,8 +417,8 @@ export const DatosLabels = ({ t, len }: { t: number; len: number }) => (
       t={t}
       from={0}
       to={13926}
-      start={48}
-      duration={30}
+      start={40}
+      duration={26}
       grouped
       style={{
         position: "absolute",

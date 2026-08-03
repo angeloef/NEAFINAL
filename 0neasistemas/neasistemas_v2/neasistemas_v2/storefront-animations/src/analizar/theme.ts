@@ -46,15 +46,22 @@ export const COL = {
 };
 
 export const FPS = 30;
-export const DURATION = 420; // 14s
+export const DURATION = 624; // 20.8s
 
 // Act boundaries. The footage window is a shared element that travels across
 // them, so these are camera moves, not cuts.
+//
+// 156 frames each, and the length is not arbitrary. An act needs three things
+// in order: ~66 frames to finish arriving (the slowest is act 3, where the
+// total has to land), a hold where the section is complete and readable, and
+// the 30-frame moveout. At the old 104 the hold was zero — the copy started
+// leaving at 74 while the last word was still settling at 66, so no section
+// was ever fully on screen. 156 buys a 60-frame hold, two full seconds.
 export const ACTS = [
-  { start: 0, end: 104 },
-  { start: 104, end: 206 },
-  { start: 206, end: 312 },
-  { start: 312, end: 420 },
+  { start: 0, end: 156 },
+  { start: 156, end: 312 },
+  { start: 312, end: 468 },
+  { start: 468, end: 624 },
 ];
 
 export const FADE = 12; // loop bookend: content dissolves to paper at both ends
