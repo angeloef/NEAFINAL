@@ -390,3 +390,148 @@ export const MARKS_DISENAR: Mark[] = [
   TypeGuides,
   HitArea,
 ];
+
+/* ── stage 03 · Construir ─────────────────────────────────────────────────
+   Marks from the craft of shipping and being measured on it.             */
+
+/** ACORDAMOS — a tick and a rule: this was agreed before anything started. */
+export const AgreementTick: Mark = ({ t, start, color, h }) => {
+  const y = h + 2;
+  return (
+    <>
+      <svg
+        width="15"
+        height="12"
+        viewBox="0 0 15 12"
+        style={el({
+          left: 0,
+          top: y - 12,
+          clipPath: `inset(0 ${g(t, start, start + 12, 100, 0)}% 0 0)`,
+        })}
+      >
+        <path
+          d="M1 6 L5 10 L14 1"
+          fill="none"
+          stroke={color}
+          strokeWidth={2.4}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+      <div
+        style={el({
+          left: 20,
+          top: y,
+          right: 0,
+          height: RULE,
+          background: color,
+          transform: `scaleX(${g(t, start + 8, start + 28)})`,
+          transformOrigin: "0% 50%",
+        })}
+      />
+    </>
+  );
+};
+
+/** LANZAMOS — a bar that completes and closes against a hard end stop. */
+export const ShippedBar: Mark = ({ t, start, color, h }) => {
+  const y = h + 1;
+  return (
+    <>
+      <div
+        style={el({
+          left: 0,
+          top: y,
+          width: "100%",
+          height: 5,
+          background: color,
+          transform: `scaleX(${g(t, start, start + 22)})`,
+          transformOrigin: "0% 50%",
+        })}
+      />
+      <div
+        style={el({
+          right: -6,
+          top: y - 6,
+          width: 4,
+          height: 17,
+          background: color,
+          transform: `scaleY(${g(t, start + 20, start + 30, 0, 1, QUINT)})`,
+          transformOrigin: "50% 50%",
+        })}
+      />
+    </>
+  );
+};
+
+/** LEEMOS — a delta: two ticks at different heights, joined by a rise. */
+export const DeltaMark: Mark = ({ t, start, color, h }) => {
+  const y = h + 3;
+  const rise = 11;
+  return (
+    <>
+      <div
+        style={el({
+          left: 0,
+          top: y,
+          width: 26,
+          height: RULE,
+          background: color,
+          opacity: 0.45,
+          transform: `scaleX(${g(t, start, start + 10)})`,
+          transformOrigin: "0% 50%",
+        })}
+      />
+      <div
+        style={el({
+          right: 0,
+          top: y - rise,
+          width: 30,
+          height: RULE,
+          background: color,
+          transform: `scaleX(${g(t, start + 14, start + 26)})`,
+          transformOrigin: "100% 50%",
+        })}
+      />
+      <div
+        style={el({
+          right: 26,
+          top: y - rise,
+          width: RULE,
+          height: rise + RULE,
+          background: color,
+          transform: `scaleY(${g(t, start + 8, start + 20, 0, 1, QUINT)})`,
+          transformOrigin: "50% 100%",
+        })}
+      />
+    </>
+  );
+};
+
+/** COBRAMOS — a receipt corner: a box with one corner cut off. */
+export const ReceiptCorner: Mark = ({ t, start, color, h }) => {
+  const cut = 11;
+  const p = g(t, start, start + 18);
+  return (
+    <div
+      style={el({
+        left: -9,
+        right: -9,
+        top: -3,
+        height: h + 9,
+        border: `1.5px solid ${color}`,
+        boxSizing: "border-box",
+        clipPath: `polygon(0 0, calc(100% - ${cut}px) 0, 100% ${cut}px, 100% 100%, 0 100%)`,
+        opacity: p,
+        transform: `scale(${g(t, start, start + 18, 1.05, 1, QUINT)})`,
+      })}
+    />
+  );
+};
+
+export const MARKS_CONSTRUIR: Mark[] = [
+  AgreementTick,
+  ShippedBar,
+  DeltaMark,
+  ReceiptCorner,
+];
