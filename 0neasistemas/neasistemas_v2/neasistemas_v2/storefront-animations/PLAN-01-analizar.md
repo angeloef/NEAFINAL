@@ -178,21 +178,39 @@ con máscara, del vocabulario decorativo:
 - `dur 16 · stagger 3 por palabra · easeOutExpo`
 - la palabra acentuada entra 4 frames después que el resto y con `dur 20`
 
-### 4.4 Capa decorativa (de `DecorativeLetterAnimations`)
+### 4.4 Capa de notación (reemplaza a la capa decorativa)
 
-Una sola forma por acto, trazada con `stroke-dasharray` animado, `strokeWidth: 2`,
-`dur 26`, arrancando 20 frames después del eyebrow. Nunca más de una en pantalla.
+**La primera versión se descartó.** Eran cuatro formas SVG dibujadas en un `viewBox`
+de 100×100 y estiradas a la caja de la palabra (~190×47) con
+`preserveAspectRatio="none"`: ninguna conservaba la proporción con la que fue
+diseñada — el "círculo" era una elipse aplastada — y cada marca era un solo elemento
+que aparecía de una. Se leía como un rayón de resaltador.
 
-| acto | forma | color | dónde |
-|---|---|---|---|
-| 1 | círculo abierto (300° de arco) | VERMILION | rodea `lograr` |
-| 2 | dos barras verticales enfrentadas | BLUE | flanquean `cliente` |
-| 3 | subrayado de doble trazo | AMBER | bajo `diciendo` |
-| 4 | corchete `⌐` en esquina | VERMILION | abraza `partida` |
+Lo que va en su lugar, en `notation.tsx`, bajo tres reglas:
 
-Se dibujan con `strokeDashoffset` interpolado de `L → 0` donde `L = getTotalLength()`
-precomputado a mano (constante en el código, no medido en runtime — Remotion renderiza
-frames sueltos y no hay garantía de layout estable).
+1. **Píxeles, no `viewBox` estirado.** Cada elemento es una caja CSS medida en px
+   contra la altura de línea de la palabra. Nada se deforma nunca.
+2. **Una marca son tres o cuatro elementos**, cada uno con su propio timing. El
+   escalonado es lo que se lee como pensado.
+3. **Cada marca viene del oficio de su acto**, así dice lo mismo que la copia.
+
+Todo anima sobre `scaleX`/`scaleY` desde un origen fijo: es compositor-friendly y,
+a diferencia de `stroke-dash`, no se rompe con la escala.
+
+| acto | marca | elementos |
+|---|---|---|
+| 1 · ESCUCHAMOS | marca de dictado | cuadrado sólido + regla + tick de cierre |
+| 2 · COMPARAMOS | cota de medición | dos ticks en las puntas + regla que crece del centro |
+| 3 · MEDIMOS | barra de dato | pista + relleno con el mismo easing que los contadores + tope |
+| 4 · DECIDIMOS | manijas de selección | cuatro esquinas de 10px fijos + regla tenue |
+
+**Todo va debajo de la línea base.** Arriba hay otra línea de copia a pocos px y
+cualquier marca ahí choca con sus descendentes — pasó con las comillas del acto 1 y
+con las manijas superiores del acto 4.
+
+La etapa 02 usa la misma mecánica con marcas del oficio de planificar y dibujar:
+corchetes de alcance, línea de secuencia con nodos, guías tipográficas punteadas, y
+área activa con puntero. Ver `PLAN-02-disenar.md`.
 
 ### 4.5 Números (el panel de datos, acto 3)
 

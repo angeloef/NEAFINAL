@@ -14,7 +14,7 @@ import {
   NegocioLabels,
   WebLabels,
 } from "./analizar/cells";
-import { SHAPES } from "./analizar/shapes";
+import { MARKS_ANALIZAR } from "./analizar/notation";
 import {
   ACTS,
   AMBER,
@@ -178,7 +178,7 @@ export const Step1Analizar = () => {
   const last = a === ACTS.length - 1;
   const exitAt = last ? undefined : len - TEXT_OUT;
   const act = SCRIPT[a];
-  const Shape = SHAPES[a];
+  const Mark = MARKS_ANALIZAR[a];
 
   // bookend dissolve so the <video loop> seam is invisible
   const fade = Math.min(
@@ -250,7 +250,7 @@ export const Step1Analizar = () => {
             color={INK}
             accent={act.accent}
             decoration={(dt, start, h) => (
-              <Shape t={dt} start={start} h={h} color={act.accent} />
+              <Mark t={dt} start={start} h={h} color={act.accent} />
             )}
           />
         </div>

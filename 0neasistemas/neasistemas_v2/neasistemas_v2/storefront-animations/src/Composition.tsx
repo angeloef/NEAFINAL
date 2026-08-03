@@ -1,6 +1,7 @@
 import { Composition } from "remotion";
 import { Step1Diagnosis } from "./Step1Diagnosis";
 import { Step2Roadmap } from "./Step2Roadmap";
+import { Step2Disenar } from "./Step2Disenar";
 import { Step1Analizar } from "./Step1Analizar";
 import { DURATION } from "./analizar/theme";
 import { TOTAL_DURATION } from "./timing";
@@ -20,6 +21,14 @@ export const MyComposition = () => {
         id="Step1Diagnosis"
         component={Step1Diagnosis}
         durationInFrames={TOTAL_DURATION}
+        fps={30}
+        width={1280}
+        height={800}
+      />
+      <Composition
+        id="Step2Disenar"
+        component={Step2Disenar}
+        durationInFrames={DURATION}
         fps={30}
         width={1280}
         height={800}
