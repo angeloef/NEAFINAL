@@ -877,7 +877,7 @@ El sistema para que tu negocio">
 
     <div class="js-hp-brands-center wg-hp-brands-center wg-hp-imagetrail-center">
         <h2 id="wg-hp-brands-title" class="js-hp-brands-title wg-hp-brands-title wg-hp-imagetrail-title">
-            <span>Negocios</span> donde la imagen <br class="d-none d-sm-block"> decide la venta
+            Trabajamos con <span>empresas y negocios</span> <br class="d-none d-sm-block"> donde la imagen y la confianza es clave.
         </h2>
     </div>
 
@@ -901,11 +901,13 @@ El sistema para que tu negocio">
 
         /* headline sits optically centred in the space ABOVE the docked card, not in the raw box */
         .wg-hp-imagetrail-center{position:relative;z-index:5;height:var(--it-stage-h);display:flex;align-items:center;justify-content:center;pointer-events:none;padding:0 clamp(1.25rem,4vw,3rem)!important;padding-bottom:calc(var(--it-card-h) + var(--it-card-gap))!important;}
-        .wg-hp-imagetrail-title{margin:0;text-align:center;max-width:min(94vw,1180px);font-size:clamp(2.75rem,7vw,6.75rem);line-height:1.05;letter-spacing:-.008em;text-wrap:balance;color:var(--it-ink);transition-property:color;transition-duration:.45s;transition-timing-function:ease;}
+        .wg-hp-imagetrail-title{margin:0;text-align:center;max-width:min(94vw,1180px);font-size:clamp(2rem,5vw,4.5rem);line-height:1.05;letter-spacing:-.008em;text-wrap:balance;color:var(--it-ink);}
         /* :not() keeps the runtime-generated word/char spans out — they must inherit, not recolor */
-        .wg-hp-imagetrail-title span:not(.it-w):not(.it-c){display:inline;font-size:inherit;color:var(--it-blue);transition-property:color;transition-duration:.45s;transition-timing-function:ease;}
-        .wg-hp-imagetrail.is-near .wg-hp-imagetrail-title{color:var(--it-orange);}
-        .wg-hp-imagetrail.is-near .wg-hp-imagetrail-title span:not(.it-w):not(.it-c){color:var(--it-amber);}
+        /* Sin colores: el acento y los virajes a naranja/ambar al acercarse quedan
+           anulados, el titulo es un solo tono plano. */
+        .wg-hp-imagetrail-title span:not(.it-w):not(.it-c){display:inline;font-size:inherit;color:inherit;}
+        .wg-hp-imagetrail.is-near .wg-hp-imagetrail-title{color:var(--it-ink);}
+        .wg-hp-imagetrail.is-near .wg-hp-imagetrail-title span:not(.it-w):not(.it-c){color:inherit;}
 
         /* per-char split (built at runtime). Words stay unbreakable so only spaces wrap. */
         /* hover-scale lives on the WORD span. The reveal is Codrops "Decorative Letter
