@@ -1687,6 +1687,34 @@ El sistema para que tu negocio">
         .hpg__stage .ltr > span { animation: none; }
     }
     .reduced-motion .hpg__hint span { animation: none; }
+    /* ---------- solo las cards, a sangre ---------- */
+    /* La cabecera se oculta, no se borra: un IntersectionObserver la observa y el
+       alto de la seccion se calcula a partir de ella. Sacarla del DOM rompe ese JS. */
+    .hpg__head,
+    .hpg__confetti { display: none !important; }
+
+    /* Full bleed: la card ocupa el ancho del viewport. Se pisa la variable en vez de
+       los anchos sueltos porque el script tambien lee --hpg-card-w. El alto queda
+       topeado al viewport (el video es object-fit:cover, no se deforma). */
+    .hpg {
+        --hpg-card-w: 100vw;
+        --hpg-h: min(62.5vw, 86vh);
+    }
+    .hpg__card { max-width: 100vw !important; }
+    .hpg__track { padding: 0 !important; }
+    .hpg:not(.is-gl) .hpg__card { width: 100vw; }
+    .hpg:not(.is-gl) .hpg__media { height: var(--hpg-h); aspect-ratio: auto; }
+
+    /* El rotulo dejo de ser un numero: se le saca el tamaño de cifra y las tabular-nums,
+       y queda a la par del nombre de la etapa, en la tipografia principal. */
+    .hpg__index {
+        font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+        font-size: clamp(1rem, 1.45vw, 1.5rem);
+        line-height: 1;
+        letter-spacing: -.02em;
+        font-variant-numeric: normal;
+    }
+    .hpg__tag { flex-wrap: wrap; align-items: center; }
 </style>
 
 <section
@@ -1719,7 +1747,7 @@ El sistema para que tu negocio">
                     </video>
                     <div class="hpg__scrim" aria-hidden="true"></div>
                         <div class="hpg__tag">
-                        <span class="hpg__index" style="--i:0" aria-hidden="true">01</span>
+                        <span class="hpg__index" style="--i:0" aria-hidden="true">Cómo es trabajar con nosotros -</span>
                         <span class="hpg__stage" style="--i:1">Analizar</span>
                     </div>
                         <div class="hpg__label-bottom">
@@ -1741,7 +1769,7 @@ El sistema para que tu negocio">
                     </video>
                     <div class="hpg__scrim" aria-hidden="true"></div>
                         <div class="hpg__tag">
-                        <span class="hpg__index" style="--i:0" aria-hidden="true">02</span>
+                        <span class="hpg__index" style="--i:0" aria-hidden="true">Cómo es trabajar con nosotros -</span>
                         <span class="hpg__stage" style="--i:1">Diseñar</span>
                     </div>
                         <div class="hpg__label-bottom">
@@ -1763,7 +1791,7 @@ El sistema para que tu negocio">
                     </video>
                     <div class="hpg__scrim" aria-hidden="true"></div>
                         <div class="hpg__tag">
-                        <span class="hpg__index" style="--i:0" aria-hidden="true">03</span>
+                        <span class="hpg__index" style="--i:0" aria-hidden="true">Cómo es trabajar con nosotros -</span>
                         <span class="hpg__stage" style="--i:1">Construir</span>
                     </div>
                         <div class="hpg__label-bottom">
@@ -4048,6 +4076,58 @@ var HPConfig = {"cdnBase":"assets","isNavbarDark":"1","isNavbarFixed":"1","icons
 })();
 </script>
 
+<!-- Hero a pantalla completa: el titulo y los CTAs bajan a la esquina inferior izquierda -->
+<style>
+    /* El video es el que lleva `is-expanded`, y el JS a veces lo reubica en el <body>,
+       asi que el estado se espeja en una clase del body (ver el script de abajo). */
+    /* sin exigir `.is-centered`: el contenido entra al modo expandido con esa clase o
+       sin ella segun por donde venga el scroll, y en ambos casos tiene que bajar */
+    body.hero-video-expanded .wg-hp-hero-content {
+        top: auto !important;
+        bottom: clamp(28px, 6vh, 72px);
+        transition: top .6s cubic-bezier(.33, 1, .68, 1),
+                    bottom .6s cubic-bezier(.33, 1, .68, 1);
+    }
+    body.hero-video-expanded .wg-hp-hero-content-inner {
+        align-items: flex-start;
+        text-align: left;
+        /* la sombra la heredan titulo y texto animado; los botones la anulan mas abajo */
+        text-shadow: 0 2px 14px rgba(0, 0, 0, .7), 0 1px 3px rgba(0, 0, 0, .55);
+    }
+    /* Degrade de apoyo: separa el bloque del video sin tapar la imagen. Va detras del
+       texto pero dentro del contenido, que ya esta por encima del video (z-index 100). */
+    body.hero-video-expanded .wg-hp-hero-content::before {
+        content: '';
+        position: absolute;
+        left: 0; right: 0; bottom: -12vh;
+        height: 62vh;
+        background: linear-gradient(to top,
+            rgba(0, 0, 0, .78) 0%, rgba(0, 0, 0, .45) 45%, rgba(0, 0, 0, 0) 100%);
+        pointer-events: none;
+        z-index: -1;
+    }
+    body.hero-video-expanded .wg-hp-hero-content-inner .btn {
+        text-shadow: none;
+        /* el CSS del sitio ya fija box-shadow en .btn, de ahi el !important */
+        box-shadow: 0 8px 28px rgba(0, 0, 0, .5) !important;
+    }
+</style>
+<script>
+(function () {
+    /* `.wg-hp-hero-video` tambien lo usa una card de la seccion brands, y esa aparece
+       primero en el DOM: el del hero es el que lleva `js-hp-hero-primary-media`. */
+    var video = document.querySelector('.js-hp-hero-primary-media');
+    if (!video) return;
+    var sync = function () {
+        document.body.classList.toggle(
+            'hero-video-expanded', video.classList.contains('is-expanded'));
+    };
+    sync();
+    new MutationObserver(sync).observe(video, {
+        attributes: true, attributeFilter: ['class']
+    });
+})();
+</script>
 </body>
 
 </html>
