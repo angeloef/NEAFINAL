@@ -4078,17 +4078,18 @@ var HPConfig = {"cdnBase":"assets","isNavbarDark":"1","isNavbarFixed":"1","icons
 
 <!-- Hero a pantalla completa: el titulo y los CTAs bajan a la esquina inferior izquierda -->
 <style>
-    /* El video es el que lleva `is-expanded`, y el JS a veces lo reubica en el <body>,
-       asi que el estado se espeja en una clase del body (ver el script de abajo). */
-    /* sin exigir `.is-centered`: el contenido entra al modo expandido con esa clase o
-       sin ella segun por donde venga el scroll, y en ambos casos tiene que bajar */
-    body.hero-video-expanded .wg-hp-hero-content {
-        top: auto !important;
-        bottom: clamp(28px, 6vh, 72px);
-        transition: top .6s cubic-bezier(.33, 1, .68, 1),
-                    bottom .6s cubic-bezier(.33, 1, .68, 1);
+    /* Se anima `top` contra `top`, que si interpola (el `top: auto` + `bottom` original
+       saltaba sin animar). Tampoco se usa transform: el hero se mueve solo durante el
+       scroll y un desplazamiento relativo se sumaba al suyo, pasandose de largo.
+       --hero-top es una posicion absoluta, asi que el destino es siempre el mismo. */
+    .wg-hp-hero-content {
+        transition: top .85s cubic-bezier(.22, 1, .36, 1) !important;
+        will-change: top;
     }
-    body.hero-video-expanded .wg-hp-hero-content-inner {
+    body.hero-scrolled .wg-hp-hero-content {
+        top: var(--hero-top) !important;
+    }
+    body.hero-scrolled .wg-hp-hero-content-inner {
         align-items: flex-start;
         text-align: left;
         /* la sombra la heredan titulo y texto animado; los botones la anulan mas abajo */
@@ -4096,7 +4097,7 @@ var HPConfig = {"cdnBase":"assets","isNavbarDark":"1","isNavbarFixed":"1","icons
     }
     /* Degrade de apoyo: separa el bloque del video sin tapar la imagen. Va detras del
        texto pero dentro del contenido, que ya esta por encima del video (z-index 100). */
-    body.hero-video-expanded .wg-hp-hero-content::before {
+    body.hero-scrolled .wg-hp-hero-content::before {
         content: '';
         position: absolute;
         left: 0; right: 0; bottom: -12vh;
@@ -4106,7 +4107,7 @@ var HPConfig = {"cdnBase":"assets","isNavbarDark":"1","isNavbarFixed":"1","icons
         pointer-events: none;
         z-index: -1;
     }
-    body.hero-video-expanded .wg-hp-hero-content-inner .btn {
+    body.hero-scrolled .wg-hp-hero-content-inner .btn {
         text-shadow: none;
         /* el CSS del sitio ya fija box-shadow en .btn, de ahi el !important */
         box-shadow: 0 8px 28px rgba(0, 0, 0, .5) !important;
@@ -4114,18 +4115,37 @@ var HPConfig = {"cdnBase":"assets","isNavbarDark":"1","isNavbarFixed":"1","icons
 </style>
 <script>
 (function () {
-    /* `.wg-hp-hero-video` tambien lo usa una card de la seccion brands, y esa aparece
-       primero en el DOM: el del hero es el que lleva `js-hp-hero-primary-media`. */
-    var video = document.querySelector('.js-hp-hero-primary-media');
-    if (!video) return;
-    var sync = function () {
-        document.body.classList.toggle(
-            'hero-video-expanded', video.classList.contains('is-expanded'));
+    var content = document.querySelector('.wg-hp-hero-content');
+    if (!content) return;
+
+    var UMBRAL = 4;          // px de scroll que disparan la animacion
+    var activo = false;
+
+    /* Solo se usa el alto del bloque, que no depende de donde este parado: sirve igual
+       aunque el hero se haya movido. Devuelve false en mobile, donde el contenido no
+       es `fixed` (ya nace abajo) y tocarle el `top` lo correria de lugar. */
+    var medir = function () {
+        if (getComputedStyle(content).position !== 'fixed') return false;
+        var margen = Math.min(Math.max(28, window.innerHeight * 0.06), 72);
+        var alto = content.getBoundingClientRect().height;
+        document.documentElement.style.setProperty(
+            '--hero-top', Math.round(window.innerHeight - alto - margen) + 'px');
+        return true;
     };
-    sync();
-    new MutationObserver(sync).observe(video, {
-        attributes: true, attributeFilter: ['class']
-    });
+
+    var alScrollear = function () {
+        var abajo = (window.scrollY || window.pageYOffset || 0) > UMBRAL;
+        if (abajo === activo) return;
+        if (abajo && !medir()) return;        // mobile: sin cambios
+        activo = abajo;
+        document.body.classList.toggle('hero-scrolled', abajo);
+    };
+
+    medir();
+    alScrollear();
+    window.addEventListener('scroll', alScrollear, { passive: true });
+    window.addEventListener('resize', medir, { passive: true });
+    window.addEventListener('load', medir);
 })();
 </script>
 </body>
