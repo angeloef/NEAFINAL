@@ -4165,12 +4165,52 @@ var HPConfig = {"cdnBase":"assets","isNavbarDark":"1","isNavbarFixed":"1","icons
         inner.style.transform = '';            // hasta 0, animando
     };
 
+    /* El disparador es el gesto, no window.scrollY: durante la apertura del hero el
+       sitio se queda con la rueda para su propia coreografia y el documento no
+       scrollea (scrollY sigue en 0), asi que escuchando `scroll` la animacion recien
+       salia al final de esa secuencia. Con el gesto arranca en el primer movimiento. */
+    var arriba = function () {
+        return (window.scrollY || window.pageYOffset || 0) <= UMBRAL;
+    };
+
+    var activar = function () {
+        if (activo || !medir()) return;       // medir() da false en mobile
+        activo = true;
+        mover(true);
+    };
+
+    var desactivar = function () {
+        if (!activo) return;
+        activo = false;
+        mover(false);
+    };
+
+    window.addEventListener('wheel', function (e) {
+        if (e.deltaY > 0) activar();
+        else if (e.deltaY < 0 && arriba()) desactivar();
+    }, { passive: true });
+
+    var tactoY = null;
+    window.addEventListener('touchstart', function (e) {
+        tactoY = e.touches[0] ? e.touches[0].clientY : null;
+    }, { passive: true });
+    window.addEventListener('touchmove', function (e) {
+        if (tactoY === null || !e.touches[0]) return;
+        var dy = tactoY - e.touches[0].clientY;
+        if (dy > 6) activar();
+        else if (dy < -6 && arriba()) desactivar();
+    }, { passive: true });
+
+    window.addEventListener('keydown', function (e) {
+        if (/^(ArrowDown|PageDown|End)$/.test(e.key) || e.key === ' ') activar();
+        else if (/^(Home|ArrowUp|PageUp)$/.test(e.key) && arriba()) desactivar();
+    }, { passive: true });
+
+    /* Red de contencion: si el scroll llega por otra via (barra, anclas, restaurado
+       al recargar), el estado igual se acomoda. */
     var alScrollear = function () {
-        var abajo = (window.scrollY || window.pageYOffset || 0) > UMBRAL;
-        if (abajo === activo) return;
-        if (abajo && !medir()) return;        // mobile: sin cambios
-        activo = abajo;
-        mover(abajo);
+        if (!arriba()) activar();
+        else desactivar();
     };
 
     medir();
