@@ -886,7 +886,8 @@ El sistema para que tu negocio">
     <style>
         .wg-hp-imagetrail{
             --it-bg:#EFECE7;--it-ink:#000000;--it-amber:#FFB400;--it-orange:#F63E02;--it-blue:#246EB9;
-            --it-stage-h:min(115vh,1128px);
+            /* exactamente una pantalla: antes eran 115vh y la seccion sobresalia */
+            --it-stage-h:100svh;
             --it-card-w:clamp(360px,38vw,600px);
             --it-card-h:calc(var(--it-card-w) / 1.6);
             --it-card-gap:clamp(1rem,2.5vh,2rem);
@@ -901,7 +902,10 @@ El sistema para que tu negocio">
 
         /* headline sits optically centred in the space ABOVE the docked card, not in the raw box */
         .wg-hp-imagetrail-center{position:relative;z-index:5;height:var(--it-stage-h);display:flex;align-items:center;justify-content:center;pointer-events:none;padding:0 clamp(1.25rem,4vw,3rem)!important;padding-bottom:calc(var(--it-card-h) + var(--it-card-gap))!important;}
-        .wg-hp-imagetrail-title{margin:0;text-align:center;max-width:min(94vw,1180px);font-size:clamp(2rem,5vw,4.5rem);line-height:1.05;letter-spacing:-.008em;text-wrap:balance;color:var(--it-ink);}
+        /* Dos lineas, las que marca el <br>: el ancho disponible y el cuerpo estan
+           calculados para que la mitad mas larga ("donde la imagen y la confianza es
+           clave.", ~21em) entre siempre. Sin `balance`, que reacomodaba el corte. */
+        .wg-hp-imagetrail-title{margin:0;text-align:center;max-width:min(96vw,1400px);font-size:clamp(1.05rem,4.2vw,3rem);line-height:1.15;letter-spacing:-.008em;color:var(--it-ink);}
         /* :not() keeps the runtime-generated word/char spans out — they must inherit, not recolor */
         /* Sin colores: el acento y los virajes a naranja/ambar al acercarse quedan
            anulados, el titulo es un solo tono plano. */
@@ -1005,7 +1009,7 @@ El sistema para que tu negocio">
         var SVGNS='http://www.w3.org/2000/svg';
         var SHAPE_TYPES=['circle','rect','polygon'];
         var SHAPE_COLORS=['#EFECE7','#000000','#FFB400','#F63E02','#246EB9'];
-        var SHAPES_PER_LETTER=20;
+        var SHAPES_PER_LETTER=0;   // sin confeti: las letras siguen apareciendo igual
         var L_DUR=400,L_STAGGER=60,S_DUR=700,S_STAGGER=40;
 
         function easeInExpo(t){ return t<=0?0:Math.pow(2,10*(t-1)); }
@@ -1466,19 +1470,6 @@ El sistema para que tu negocio">
     /* per-char split, built at runtime (Codrops "Decorative Letter Animations", effect 8 / "Jumbuck") */
     .hpg__title .jb-w { display: inline-block; white-space: nowrap; }
     .hpg__title .jb-c { display: inline-block; will-change: transform, opacity; }
-    /* Confetti field: sticky so one viewport-sized canvas backs the whole section instead of
-       a multi-screen-tall buffer, and the negative margin keeps it out of the flow so the
-       head still starts at the top of the section. The mask keeps it from reading as uniform
-       noise — it thins out toward the edges and never fights the cards for contrast. */
-    .hpg__confetti {
-        position: sticky; top: 0;
-        display: block; width: 100%; height: 100vh; height: 100svh;
-        margin-bottom: -100vh; margin-bottom: -100svh;
-        pointer-events: none; z-index: 0;
-        -webkit-mask-image: radial-gradient(ellipse 76% 68% at 50% 42%, #000 32%, transparent 94%);
-        mask-image: radial-gradient(ellipse 76% 68% at 50% 42%, #000 32%, transparent 94%);
-    }
-
     /* ---------- pinned horizontal gallery ---------- */
     .hpg__pin { position: sticky; top: 0; height: 100vh; display: flex; align-items: center; }
 
@@ -1692,8 +1683,7 @@ El sistema para que tu negocio">
     /* ---------- solo las cards, a sangre ---------- */
     /* La cabecera se oculta, no se borra: un IntersectionObserver la observa y el
        alto de la seccion se calcula a partir de ella. Sacarla del DOM rompe ese JS. */
-    .hpg__head,
-    .hpg__confetti { display: none !important; }
+    .hpg__head { display: none !important; }
 
     /* Full bleed: la card ocupa el ancho del viewport. Se pisa la variable en vez de
        los anchos sueltos porque el script tambien lee --hpg-card-w. El alto queda
@@ -1943,308 +1933,6 @@ El sistema para que tu negocio">
     }, { threshold: [0, 0.35] }).observe(head);
 })();
 </script>
-
-<script id="hp-process-confetti">
-/* Section-wide confetti field. Replaces the per-letter SVG shapes of the Jumbuck effect:
-   same four tokens, same "it lands and stays" character, but spread over the whole black
-   backdrop and driven by a small physics loop instead of a fixed timeline.
-
-   Per particle: an anchor it always wants to return to (spring), a slow idle orbit so the
-   field breathes when nobody touches it, depth (z) that scales size, parallax and how hard
-   it answers the pointer, and rotation coupled to its own speed.
-   The pointer contributes two forces — radial push-away, and its own velocity as wind, so a
-   fast swipe throws confetti in the direction of the gesture instead of only shoving it.
-
-   One canvas, sticky over the section, 2D context. ponytail: the GL layer next door is for
-   the card gallery; a backdrop of ~150 flat sprites does not need a second WebGL context. */
-(function () {
-    var section = document.querySelector('.hpg');
-    if (!section) return;
-
-    var COLORS = ['#EFECE7', '#FFB400', '#F63E02', '#246EB9'];
-    var reduce = document.documentElement.classList.contains('reduced-motion') ||
-        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    var canvas = document.createElement('canvas');
-    canvas.className = 'hpg__confetti';
-    canvas.setAttribute('aria-hidden', 'true');
-    section.insertBefore(canvas, section.firstChild);
-    var ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    var coarse = window.matchMedia('(pointer: coarse)').matches;
-    // phones carry a third of the nodes and skip the pointer field entirely
-    var COUNT = coarse ? 62 : (window.innerWidth < 900 ? 126 : 196);
-    var REST_CARD = .46;    // how much speed survives a bounce off a card edge
-    var REST_P = .62;       // ... and off another particle
-    var SLIDE = .985;       // tangential survival, so they skate along an edge instead of sticking
-    /* The push and the spring fight each other: a particle parks where PUSH*falloff*z equals
-       SPRING*displacement, so these two numbers set how wide the hole around the cursor opens
-       (~80px at half-radius here). Raising SPRING tightens the field back up but shrinks the
-       hole — tune them as a pair, not one at a time. */
-    var R = 240;            // pointer influence radius, px
-    var PUSH = 4.6;         // radial repulsion
-    var WIND = 0.35;        // share of pointer velocity handed to nearby particles
-    var SPRING = 0.014;     // pull back to the anchor
-    var DAMP = 0.905;
-    var PARALLAX = 90;      // px of scroll-linked drift at z = 1
-
-    var W = 0, H = 0, dpr = 1, parts = [];
-
-    function rnd(a, b) { return a + Math.random() * (b - a); }
-
-    function build() {
-        parts = [];
-        for (var i = 0; i < COUNT; i++) {
-            var z = rnd(.35, 1);
-            parts.push({
-                ax: Math.random(), ay: Math.random(),   // anchor, normalized so resize keeps the spread
-                x: 0, y: 0, vx: 0, vy: 0,
-                z: z,
-                size: rnd(3.5, 13) * z,
-                type: i % 3,                            // 0 circle, 1 rect, 2 triangle
-                color: COLORS[(Math.random() * COLORS.length) | 0],
-                rot: rnd(0, Math.PI * 2), spin: rnd(-.006, .006),
-                alpha: rnd(.3, .78) * (.55 + .45 * z),
-                ph: rnd(0, Math.PI * 2),                // idle orbit phase
-                orb: rnd(5, 22) * z,
-                spd: rnd(.00012, .0004)
-            });
-        }
-    }
-
-    function resize() {
-        var r = canvas.getBoundingClientRect();
-        W = r.width; H = r.height;
-        if (!W || !H) return;
-        dpr = Math.min(window.devicePixelRatio || 1, 2);
-        canvas.width = Math.round(W * dpr);
-        canvas.height = Math.round(H * dpr);
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        parts.forEach(function (p) {          // re-seat, keep whatever velocity it had
-            if (!p.seeded) { p.x = p.ax * W; p.y = p.ay * H; p.seeded = true; }
-        });
-    }
-
-    // pointer, lerped: px/py trail the real cursor so the wind term is a real velocity
-    var tpx = -9999, tpy = -9999, px = tpx, py = tpy, pvx = 0, pvy = 0, hasPointer = false;
-    if (!coarse && !reduce) {
-        window.addEventListener('pointermove', function (e) {
-            var r = canvas.getBoundingClientRect();
-            tpx = e.clientX - r.left; tpy = e.clientY - r.top;
-            if (!hasPointer) { px = tpx; py = tpy; hasPointer = true; }
-        }, { passive: true });
-        window.addEventListener('pointerleave', function () { hasPointer = false; tpx = tpy = -9999; }, { passive: true });
-    }
-
-    /* Entry burst: the field is thrown outward from the middle of the headline and the
-       springs reel it back in — the spray of the original effect, without a timeline. */
-    section.addEventListener('hpg:enter', function () {
-        for (var i = 0; i < parts.length; i++) {
-            var p = parts[i];
-            var a = Math.random() * Math.PI * 2, s = rnd(3, 11) * p.z;
-            p.x = W * .5 + Math.cos(a) * rnd(0, 60);
-            p.y = H * .42 + Math.sin(a) * rnd(0, 60);
-            p.vx = Math.cos(a) * s; p.vy = Math.sin(a) * s;
-            p.spin = rnd(-.05, .05);
-        }
-        fade = 0;
-    });
-
-    function draw(p) {
-        ctx.save();
-        ctx.translate(p.x, p.y);
-        ctx.rotate(p.rot);
-        ctx.fillStyle = p.color;
-        ctx.globalAlpha = p.alpha * fade;
-        var s = p.size;
-        if (p.type === 0) { ctx.beginPath(); ctx.arc(0, 0, s * .5, 0, Math.PI * 2); ctx.fill(); }
-        else if (p.type === 1) { ctx.fillRect(-s * .5, -s * .34, s, s * .68); }
-        else {
-            ctx.beginPath();
-            ctx.moveTo(0, -s * .6); ctx.lineTo(s * .55, s * .45); ctx.lineTo(-s * .55, s * .45);
-            ctx.closePath(); ctx.fill();
-        }
-        ctx.restore();
-    }
-
-    /* Card collision. The gallery translates .js-hpg-track in the DOM, so the cards' own
-       rects are the truth on screen in both the WebGL and the fallback layout — no need to
-       mirror the GL transform. Their per-frame horizontal speed is handed to whatever they
-       hit, which is what makes a card read as plowing through the confetti instead of
-       teleporting past it. */
-    var cardEls = [].slice.call(section.querySelectorAll('.js-hpg-card'));
-    var cards = cardEls.map(function () { return { x0: 0, y0: 0, x1: 0, y1: 0, vx: 0, prev: null, on: false }; });
-
-    function readCards() {
-        var base = canvas.getBoundingClientRect();
-        for (var i = 0; i < cardEls.length; i++) {
-            var r = cardEls[i].getBoundingClientRect(), c = cards[i];
-            c.on = r.width > 0 && r.right > base.left - 200 && r.left < base.right + 200 &&
-                r.bottom > base.top && r.top < base.bottom;
-            if (!c.on) { c.prev = null; c.vx = 0; continue; }
-            var left = r.left - base.left;
-            c.vx = c.prev === null ? 0 : left - c.prev;
-            c.prev = left;
-            c.x0 = left; c.x1 = left + r.width;
-            c.y0 = r.top - base.top; c.y1 = c.y0 + r.height;
-        }
-    }
-
-    /* An anchor that falls under a card would press its particle into the edge for as long
-       as the card sits there, and the whole gallery would wear a static dotted outline. So
-       the spring target gets evicted too — same shallowest-axis push, applied to the point
-       the particle is aiming at rather than to the particle. The result is a loose dusting
-       that a passing card sweeps aside, not a pile-up. Returns [x, y]. */
-    var tgt = [0, 0];
-    function evict(x, y, pad) {
-        for (var i = 0; i < cards.length; i++) {
-            var c = cards[i];
-            if (!c.on) continue;
-            if (x < c.x0 - pad || x > c.x1 + pad || y < c.y0 - pad || y > c.y1 + pad) continue;
-            var dl = x - (c.x0 - pad), dr = (c.x1 + pad) - x;
-            var dt = y - (c.y0 - pad), db = (c.y1 + pad) - y;
-            var m = Math.min(dl, dr, dt, db);
-            if (m === dl) x = c.x0 - pad;
-            else if (m === dr) x = c.x1 + pad;
-            else if (m === dt) y = c.y0 - pad;
-            else y = c.y1 + pad;
-        }
-        tgt[0] = x; tgt[1] = y;
-        return tgt;
-    }
-
-    /* Circle vs AABB, resolved on the shallowest axis: push the particle back out to the
-       edge it came closest to crossing, flip that velocity component, keep most of the
-       tangential one so it slides. */
-    function hitCards(p, rad) {
-        for (var i = 0; i < cards.length; i++) {
-            var c = cards[i];
-            if (!c.on) continue;
-            if (p.x < c.x0 - rad || p.x > c.x1 + rad || p.y < c.y0 - rad || p.y > c.y1 + rad) continue;
-            var dl = p.x - (c.x0 - rad), dr = (c.x1 + rad) - p.x;
-            var dt = p.y - (c.y0 - rad), db = (c.y1 + rad) - p.y;
-            var m = Math.min(dl, dr, dt, db);
-            if (m === dl) { p.x = c.x0 - rad; if (p.vx > 0) p.vx = -p.vx * REST_CARD; p.vx += c.vx * .55; p.vy *= SLIDE; }
-            else if (m === dr) { p.x = c.x1 + rad; if (p.vx < 0) p.vx = -p.vx * REST_CARD; p.vx += c.vx * .55; p.vy *= SLIDE; }
-            else if (m === dt) { p.y = c.y0 - rad; if (p.vy > 0) p.vy = -p.vy * REST_CARD; p.vx = p.vx * SLIDE + c.vx * .55; }
-            else { p.y = c.y1 + rad; if (p.vy < 0) p.vy = -p.vy * REST_CARD; p.vx = p.vx * SLIDE + c.vx * .55; }
-            p.spin += (p.vx * .0012 - p.spin) * .3;
-        }
-    }
-
-    /* Equal-mass impulse along the contact normal, plus positional relaxation so a pile
-       doesn't sink into itself.
-       ponytail: O(n²) over ~200 particles is ~20k rejects per frame and measures flat here;
-       swap in a uniform grid if the count ever goes past ~400. */
-    function collide() {
-        for (var i = 0; i < parts.length; i++) {
-            var a = parts[i], ar = a.size * .5;
-            for (var j = i + 1; j < parts.length; j++) {
-                var b = parts[j];
-                var dx = b.x - a.x, dy = b.y - a.y;
-                var rs = ar + b.size * .5;
-                if (dx > rs || dx < -rs || dy > rs || dy < -rs) continue;   // cheap AABB reject first
-                var d2 = dx * dx + dy * dy;
-                if (d2 >= rs * rs || d2 === 0) continue;
-                var d = Math.sqrt(d2), nx = dx / d, ny = dy / d;
-                var push = (rs - d) * .5;
-                a.x -= nx * push; a.y -= ny * push;
-                b.x += nx * push; b.y += ny * push;
-                var rel = (b.vx - a.vx) * nx + (b.vy - a.vy) * ny;
-                if (rel < 0) {
-                    var imp = rel * REST_P;
-                    a.vx += imp * nx; a.vy += imp * ny;
-                    b.vx -= imp * nx; b.vy -= imp * ny;
-                    a.spin -= imp * .004; b.spin += imp * .004;
-                }
-            }
-        }
-    }
-
-    var fade = 0, running = false, last = 0;
-
-    function frame(now) {
-        if (!running) return;
-        var dt = Math.min(now - last, 50) / 16.667;    // in frames, clamped over tab switches
-        last = now;
-        fade += (1 - fade) * .05;
-
-        // scroll progress across the section drives the depth parallax
-        var r = section.getBoundingClientRect();
-        var prog = r.height > H ? Math.min(Math.max(-r.top / (r.height - H), 0), 1) : 0;
-
-        if (hasPointer) { pvx = (tpx - px) * .22; pvy = (tpy - py) * .22; px += pvx; py += pvy; }
-        else { pvx = pvy = 0; }
-
-        readCards();
-
-        for (var i = 0; i < parts.length; i++) {
-            var p = parts[i];
-            // anchor + idle orbit + parallax = where this particle wants to be right now
-            var t = now * p.spd;
-            var bx = p.ax * W + Math.cos(t + p.ph) * p.orb;
-            var by = p.ay * H + Math.sin(t * 1.3 + p.ph) * p.orb - prog * PARALLAX * p.z;
-            // a target under a card is relocated to the nearest free edge (see evict)
-            var g = evict(bx, by, 26); bx = g[0]; by = g[1];
-
-            if (hasPointer) {
-                var dx = p.x - px, dy = p.y - py, d2 = dx * dx + dy * dy;
-                if (d2 < R * R) {
-                    var d = Math.sqrt(d2) || 1;
-                    var f = 1 - d / R; f *= f;              // quadratic falloff
-                    var react = f * p.z;
-                    p.vx += (dx / d) * PUSH * react + pvx * WIND * react;
-                    p.vy += (dy / d) * PUSH * react + pvy * WIND * react;
-                    p.spin += (pvx * .0009 + f * .002) * p.z;
-                }
-            }
-
-            p.vx += (bx - p.x) * SPRING;
-            p.vy += (by - p.y) * SPRING;
-            p.vx *= DAMP; p.vy *= DAMP;
-            p.x += p.vx * dt; p.y += p.vy * dt;
-
-            // spin settles back toward its lazy idle rate instead of ringing forever
-            p.spin += (0 - p.spin) * .012;
-            p.rot += (p.spin + Math.hypot(p.vx, p.vy) * .002) * dt;
-        }
-
-        // pairs first, cards last: a pile shoved by its neighbours still can't end the frame
-        // inside a card
-        collide();
-        for (var c2 = 0; c2 < parts.length; c2++) hitCards(parts[c2], parts[c2].size * .5);
-
-        ctx.clearRect(0, 0, W, H);
-        for (var k = 0; k < parts.length; k++) draw(parts[k]);
-        requestAnimationFrame(frame);
-    }
-
-    build();
-    resize();
-
-    if (reduce) {                     // one static, pointer-deaf frame
-        fade = 1;
-        parts.forEach(function (p) { p.x = p.ax * W; p.y = p.ay * H; draw(p); });
-        return;
-    }
-
-    var relayout;
-    window.addEventListener('resize', function () {
-        clearTimeout(relayout);
-        relayout = setTimeout(resize, 140);
-    }, { passive: true });
-
-    /* The loop only runs while the section is on screen — this is a backdrop, it has no
-       business burning frames three viewports away. */
-    new IntersectionObserver(function (es) {
-        var on = es[es.length - 1].isIntersecting;
-        if (on && !running) { running = true; last = performance.now(); requestAnimationFrame(frame); }
-        else if (!on) { running = false; }
-    }, { threshold: 0 }).observe(section);
-})();
-</script>
-
 <script type="module" id="hp-process-gl">
 // Horizontal Parallax Gallery (WebGL) — port of the Codrops demo (davidfaure), scoped to this section.
 import * as THREE from './assets/three.module.min.js';
