@@ -4082,12 +4082,25 @@ var HPConfig = {"cdnBase":"assets","isNavbarDark":"1","isNavbarFixed":"1","icons
        saltaba sin animar). Tampoco se usa transform: el hero se mueve solo durante el
        scroll y un desplazamiento relativo se sumaba al suyo, pasandose de largo.
        --hero-top es una posicion absoluta, asi que el destino es siempre el mismo. */
-    .wg-hp-hero-content {
-        transition: top .85s cubic-bezier(.22, 1, .36, 1) !important;
-        will-change: top;
+    /* El contenedor salta a destino sin transicion, y lo que se anima es el bloque
+       interno (que el script del hero no toca) con la tecnica FLIP: se lo deja donde
+       estaba y se lo suelta. Animar el `top` del contenedor no servia: una transicion
+       en curso le gana hasta al !important, y el hero reescribe su posicion en cada
+       paso del scroll, con lo cual la animacion se reiniciaba sola y recien se
+       acomodaba al terminar la secuencia. */
+    .wg-hp-hero-content-inner {
+        transition: transform .85s cubic-bezier(.22, 1, .36, 1);
+        will-change: transform;
     }
     body.hero-scrolled .wg-hp-hero-content {
+        transition: none !important;
         top: var(--hero-top) !important;
+        /* El script del hero escribe transform inline en cada frame del scroll
+           (scale + translateY, su coreografia original). Mientras el bloque va a la
+           esquina eso pelea con el `top` y se ve como un tiron, ademas de que recien
+           se acomoda cuando esa secuencia termina. Un !important en CSS le gana al
+           inline sin important, asi que el movimiento queda solo en nuestras manos. */
+        transform: none !important;
     }
     body.hero-scrolled .wg-hp-hero-content-inner {
         align-items: flex-start;
@@ -4117,6 +4130,7 @@ var HPConfig = {"cdnBase":"assets","isNavbarDark":"1","isNavbarFixed":"1","icons
 (function () {
     var content = document.querySelector('.wg-hp-hero-content');
     if (!content) return;
+    var inner = content.querySelector('.wg-hp-hero-content-inner') || content;
 
     var UMBRAL = 4;          // px de scroll que disparan la animacion
     var activo = false;
@@ -4133,12 +4147,30 @@ var HPConfig = {"cdnBase":"assets","isNavbarDark":"1","isNavbarFixed":"1","icons
         return true;
     };
 
+    /* FLIP: se anota donde estaba, se cambia el estado (el contenedor salta), y el
+       bloque interno arranca desplazado esa misma diferencia para volver a cero
+       animando. Asi la animacion no depende del `top`, que el hero se reescribe. */
+    var mover = function (abajo) {
+        var antes = content.getBoundingClientRect().top;
+        document.body.classList.toggle('hero-scrolled', abajo);
+        var delta = antes - content.getBoundingClientRect().top;
+        if (!delta) return;
+        inner.style.transition = 'none';
+        inner.style.transform = 'translateY(' + delta + 'px)';
+        /* reflow forzado en vez de requestAnimationFrame: fija ese valor como punto
+           de partida de forma sincrona. Con rAF, si el navegador esta throttleando
+           los frames (pestaña en segundo plano), el bloque se queda desplazado. */
+        void inner.offsetHeight;
+        inner.style.transition = '';           // vuelve a la del CSS
+        inner.style.transform = '';            // hasta 0, animando
+    };
+
     var alScrollear = function () {
         var abajo = (window.scrollY || window.pageYOffset || 0) > UMBRAL;
         if (abajo === activo) return;
         if (abajo && !medir()) return;        // mobile: sin cambios
         activo = abajo;
-        document.body.classList.toggle('hero-scrolled', abajo);
+        mover(abajo);
     };
 
     medir();
