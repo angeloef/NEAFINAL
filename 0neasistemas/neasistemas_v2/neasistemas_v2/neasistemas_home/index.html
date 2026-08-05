@@ -1426,15 +1426,14 @@ El sistema para que tu negocio">
         position: relative;
         z-index: 2;
         /* sized to the copy, not to the viewport: at 88vh the headline floated in a big
-           empty black box. The confetti spray supplies the rest of the visual mass. */
+           empty black box. */
         min-height: min(46vh, 470px);
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
         text-align: center;
-        /* bottom padding pulled right in: the headline and the gallery are one unit, and the
-           confetti already fills whatever air is left */
+        /* bottom padding pulled right in: the headline and the gallery are one unit */
         padding: clamp(72px, 10vh, 140px) clamp(1.25rem, 4vw, 3rem) clamp(12px, 1.6vh, 24px);
     }
 
@@ -1807,9 +1806,8 @@ El sistema para que tu negocio">
 
 <script id="hp-process-title">
 /* Codrops "Decorative Letter Animations", effect index 7 (the demo labels it "Jumbuck") —
-   letters only. The confetti that shipped with the effect used to be per-letter SVG shapes
-   welded to the headline box; it now lives in #hp-process-confetti as a section-wide,
-   pointer-reactive canvas field, so this block is just the type animation.
+   letters only. The per-letter SVG shapes that shipped with the effect are switched off
+   (SHAPES_PER_LETTER = 0), so this block is just the type animation.
    Original values kept 1:1 — 360ms per letter, easeOutElastic, reverse stagger of 55ms
    (last letter resolves first), translateY ±80% alternating by index, rotate 90->0,
    opacity ramped over the first 100ms. */
@@ -1928,7 +1926,6 @@ El sistema para que tu negocio">
             playing = true;
             start = performance.now();
             requestAnimationFrame(loop);
-            section.dispatchEvent(new CustomEvent('hpg:enter'));   // confetti burst rides along
         }
     }, { threshold: [0, 0.35] }).observe(head);
 })();
