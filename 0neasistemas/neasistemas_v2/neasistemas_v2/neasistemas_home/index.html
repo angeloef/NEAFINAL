@@ -876,9 +876,18 @@ El sistema para que tu negocio">
     </div>
 
     <div class="js-hp-brands-center wg-hp-brands-center wg-hp-imagetrail-center">
-        <h2 id="wg-hp-brands-title" class="js-hp-brands-title wg-hp-brands-title wg-hp-imagetrail-title">
-            Trabajamos con <span>empresas y negocios</span> <br class="d-none d-sm-block"> donde la imagen y la confianza es clave.
-        </h2>
+        <div class="wg-hp-imagetrail-copy">
+            <h2 id="wg-hp-brands-title" class="js-hp-brands-title wg-hp-brands-title wg-hp-imagetrail-title">
+                Trabajamos con <span>empresas y negocios</span> donde la imagen y la confianza es clave.
+            </h2>
+            <p class="wg-hp-imagetrail-lede">
+                Cada negocio llega con un punto de partida distinto: algunos necesitan su
+                primera web, otros ya venden y necesitan ordenar el sistema que hay detrás.
+                Trabajamos sobre lo que ya tenés, o desde cero, para que la imagen, el
+                catálogo y la atención cuenten la misma historia. Que quien entra entienda
+                en diez segundos qué hacés, y te escriba.
+            </p>
+        </div>
     </div>
 
     <div class="wg-hp-imagetrail-hint d-md-none">Mové el dedo por la pantalla</div>
@@ -901,11 +910,14 @@ El sistema para que tu negocio">
         .wg-hp-imagetrail-img{width:230px;max-width:32vw;aspect-ratio:4/5;object-fit:cover;position:absolute;top:0;left:0;opacity:0;will-change:transform,opacity;border-radius:10px;box-shadow:0 12px 30px rgba(0,0,0,.18);outline:1px solid rgba(0,0,0,.1);outline-offset:-1px;}
 
         /* headline sits optically centred in the space ABOVE the docked card, not in the raw box */
-        .wg-hp-imagetrail-center{position:relative;z-index:5;height:var(--it-stage-h);display:flex;align-items:center;justify-content:center;pointer-events:none;padding:0 clamp(1.25rem,4vw,3rem)!important;padding-bottom:calc(var(--it-card-h) + var(--it-card-gap))!important;}
-        /* Dos lineas, las que marca el <br>: el ancho disponible y el cuerpo estan
-           calculados para que la mitad mas larga ("donde la imagen y la confianza es
-           clave.", ~21em) entre siempre. Sin `balance`, que reacomodaba el corte. */
-        .wg-hp-imagetrail-title{margin:0;text-align:center;max-width:min(96vw,1400px);font-size:clamp(1.05rem,4.2vw,3rem);line-height:1.15;letter-spacing:-.008em;color:var(--it-ink);}
+        /* Dos columnas: el texto ocupa la izquierda, el video aterriza en la derecha.
+           Antes el bloque iba centrado con hueco abajo para la tarjeta. */
+        .wg-hp-imagetrail-center{position:relative;z-index:5;height:var(--it-stage-h);display:flex;align-items:center;justify-content:flex-start;pointer-events:none;padding:0 clamp(1.25rem,4vw,3rem)!important;padding-bottom:0!important;}
+        .wg-hp-imagetrail-copy{position:relative;z-index:1;width:min(46%,620px);text-align:left;}
+        .wg-hp-imagetrail-lede{margin:clamp(1rem,2vh,1.5rem) 0 0;font-size:clamp(1rem,1.15vw,1.15rem);line-height:1.6;color:var(--it-ink);opacity:.78;}
+        /* En columna el titulo envuelve solo; el cuerpo ya no se calcula para forzar
+           dos lineas como cuando ocupaba el ancho completo. */
+        .wg-hp-imagetrail-title{margin:0;text-align:left;max-width:none;font-size:clamp(1.9rem,3.4vw,3.25rem);line-height:1.1;letter-spacing:-.012em;color:var(--it-ink);}
         /* :not() keeps the runtime-generated word/char spans out — they must inherit, not recolor */
         /* Sin colores: el acento y los virajes a naranja/ambar al acercarse quedan
            anulados, el titulo es un solo tono plano. */
@@ -935,11 +947,14 @@ El sistema para que tu negocio">
         .wg-hp-imagetrail-hint{position:absolute;left:0;right:0;bottom:1rem;z-index:6;text-align:center;font-size:.8rem;color:var(--it-ink);opacity:.55;pointer-events:none;}
         @media (min-width:768px){.wg-hp-imagetrail-hint{display:none;}}
 
-        /* docked hero video: bottom-centred, sized off --it-card-*.
-           Centred with auto margins (NOT translateX) because section-hero.min.js
-           overwrites style.transform on this node every scroll frame. */
+        /* Columna derecha: es tambien el destino del video del hero
+           (.js-hp-brands-video-target), asi que moverla de abajo-centro a la derecha es
+           lo que hace que el video se encoja hacia ese costado; el script lee el rect
+           de este nodo y no hay que tocarlo.
+           Centrado vertical con margenes automaticos (NO translateY) porque
+           section-hero.min.js sobrescribe style.transform aca en cada frame. */
         @media (min-width:768px){
-            .wg-hp-imagetrail .wg-hp-brands-video-wrapper{position:absolute;top:auto;left:0;right:0;bottom:var(--it-card-gap);margin:0 auto;width:var(--it-card-w);height:var(--it-card-h);border-radius:24px;background-color:var(--it-ink);box-shadow:0 28px 64px -16px rgba(0,0,0,.32),0 6px 16px -4px rgba(0,0,0,.14);}
+            .wg-hp-imagetrail .wg-hp-brands-video-wrapper{position:absolute;top:0;bottom:0;left:auto;right:clamp(1.25rem,4vw,3rem);margin:auto 0;width:min(46vw,760px);height:min(52vh,520px);border-radius:24px;background-color:var(--it-ink);box-shadow:0 28px 64px -16px rgba(0,0,0,.32),0 6px 16px -4px rgba(0,0,0,.14);}
             /* concentric radius: video fills the card edge-to-edge, so radii match.
                !important beats the inline borderRadius:16px the dock JS writes. */
             .wg-hp-imagetrail .wg-hp-brands-video-wrapper .wg-hp-hero-video,
@@ -950,6 +965,11 @@ El sistema para que tu negocio">
             .wg-hp-imagetrail{padding:60px 0!important;min-height:520px;}
             .wg-hp-imagetrail-center{height:auto;min-height:400px;padding-bottom:0!important;}
             .wg-hp-imagetrail-img{width:150px;max-width:44vw;}
+            /* apiladas: el texto arriba y el video debajo, a lo ancho */
+            .wg-hp-imagetrail-copy{width:100%;}
+            .wg-hp-brands-video-wrapper{position:relative;top:auto;right:auto;bottom:auto;
+                left:auto;margin:clamp(1.5rem,4vh,2.5rem) auto 0;width:100%;
+                height:auto;aspect-ratio:16/10;}
         }
         @media (prefers-reduced-motion:reduce){
             .wg-hp-imagetrail-title .it-c{transition:none;animation:none;}
@@ -1215,8 +1235,8 @@ El sistema para que tu negocio">
     aria-labelledby="hp-features-title"
 >
         <div class="wg-hp-features-header">
-                <h2 id="hp-features-title" class="section-animate fw-normal wg-hp-features-title mb-2 h1">
-            Cuatro frentes, un solo sistema<br>Conectados entre sí, no servicios sueltos        </h2>
+                <h2 id="hp-features-title" class="section-animate wg-hp-features-title mb-2 h1">
+            Las bases fundamentales<br>para que tu empresa triunfe en la web.        </h2>
             </div>
     
     <div class="wg-hp-features-slider">
@@ -1236,7 +1256,7 @@ El sistema para que tu negocio">
                         >
                         <div class="feature-card">
                                                         <div class="feature-card-bg" aria-hidden="true">
-                                <img src="assets/feature-1.f1053cb2.webp" alt="Una web que convierte visitas en consultas" srcset="assets/feature-1.f1053cb2.webp 400w, assets/feature-1.f1053cb2.webp 800w, assets/feature-1.f1053cb2.webp 1200w, assets/feature-1.f1053cb2.webp 1600w" sizes="(max-width: 991px) 90vw, 50vw" loading="lazy" decoding="async" class="feature-card-bg-img" />                            </div>
+                                <img src="assets/feature-1.f1053cb2.webp" alt="Una web hecha a medida" srcset="assets/feature-1.f1053cb2.webp 400w, assets/feature-1.f1053cb2.webp 800w, assets/feature-1.f1053cb2.webp 1200w, assets/feature-1.f1053cb2.webp 1600w" sizes="(max-width: 991px) 90vw, 50vw" loading="lazy" decoding="async" class="feature-card-bg-img" />                            </div>
                             
                             <div class="feature-card-overlay"></div>
 
@@ -1246,16 +1266,16 @@ El sistema para que tu negocio">
                                 data-category="<homepage><features><card><link>"
                                 data-action="<clicked><tienda-online-de-alto-rendimiento>"
                                 target="_blank"
-                                aria-label="Una web que convierte visitas en consultas"
+                                aria-label="Una web hecha a medida"
                             ></a>
                             
                             <div class="feature-card-content text-white">
                                 <div class="d-flex flex-column">
                                                                         <h3 class="h3 fw-bold feature-card-title mb-0">
-                                        Una web que convierte visitas en consultas                                    </h3>
+                                        Una web hecha a medida.                                    </h3>
                                     
                                                                         <p class="h5 fw-normal feature-card-description">
-                                        Tu web es la puerta de entrada. Pensada para que quien te visite termine escribiéndote, no para que se vaya.                                    </p>
+                                        No usamos plantillas ni fórmulas prearmadas. Diseñamos a mano la experiencia de tu sitio, pensada para transmitir tus ideas y los valores de tu empresa. Nos enfocamos en que cada palabra y cada elemento visual comunique algo: una imagen limpia y confiable que la mayoría de las webs, hechas rellenando plantillas, no logran dar.                                    </p>
                                     
                                 </div>
 
@@ -1263,7 +1283,7 @@ El sistema para que tu negocio">
                                     href="#"
                                     class="feature-card-arrow"
                                     target="_blank"
-                                    aria-label="Learn more about Una web que convierte visitas en consultas"
+                                    aria-label="Learn more about Una web hecha a medida"
                                 >
                                     <svg fill="currentColor" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 16 16"><path d="M13.408 8.648V7.351H1.5v1.297z"/><path d="M14.388 8.357a.63.63 0 0 0-.086-.816L8.513 2l-.958.918L12.863 8l-5.308 5.08.478.46.48.459 5.789-5.541z"/></svg>                                </a>
                                                             </div>
@@ -3806,6 +3826,14 @@ var HPConfig = {"cdnBase":"assets","isNavbarDark":"1","isNavbarFixed":"1","icons
             rgba(0, 0, 0, .78) 0%, rgba(0, 0, 0, .45) 45%, rgba(0, 0, 0, 0) 100%);
         pointer-events: none;
         z-index: -1;
+    }
+    /* Titulo de features igualado al de la seccion anterior (.wg-hp-imagetrail-title):
+       mismo cuerpo y mismo peso 600. Venia en 52px con la clase fw-normal. */
+    .wg-hp-features-title {
+        font-size: clamp(1.9rem, 3.4vw, 3.25rem) !important;
+        font-weight: 600 !important;
+        line-height: 1.1;
+        letter-spacing: -.012em;
     }
     body.hero-scrolled .wg-hp-hero-content-inner .btn {
         text-shadow: none;
